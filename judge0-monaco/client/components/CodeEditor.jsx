@@ -4,6 +4,7 @@ import { Box, HStack } from "@chakra-ui/react";
 import LanguageSelector from "./LanguageSelector";
 import { CODE_SNIPPETS } from "../utils/constants";
 import Output from "./Output";
+import Question from "./Question";
 
 const CodeEditor = () => {
   const [value, setValue] = React.useState("");
@@ -27,6 +28,7 @@ const CodeEditor = () => {
 
   return (
     <Box>
+      <Question />
       <HStack>
         <Box w={"50%"}>
           <LanguageSelector

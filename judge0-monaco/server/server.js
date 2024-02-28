@@ -18,11 +18,13 @@ const judge0Api = axios.create({
 // Main function to run the app
 async function initializeApp() {
   app.post("/run-code", async (req, res) => {
-    const { langId, sourceCode } = req.body;
+    const { langId, sourceCode, expected_output, stdin } = req.body;
 
     const data = {
       language_id: langId,
       source_code: sourceCode,
+      stdin,
+      expected_output,
     };
 
     try {
@@ -33,6 +35,10 @@ async function initializeApp() {
       do {
         submissionResponse = await judge0Api.get(`/submissions/${token}`);
         console.log(submissionResponse.data);
+
+        if (submissionResponse.data.status.id <= 2) {
+          await new Promise((resolve) => setTimeout(resolve, 1000));
+        }
         
       } while (submissionResponse.data.status.id <= 2);
 

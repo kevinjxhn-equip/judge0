@@ -17,37 +17,54 @@ const Output = ({ editorRef, activeLanguage }) => {
     try {
       setIsLoading(true);
       const result = await executeCode(activeLanguage, sourceCode);
+      console.log(result);
 
-      if (result.stderr) {
-        setIsError(true);
-        setOutput(result.stderr.split("\n"));
-      } else if (result.status.description === "Compilation Error") {
-        setIsError(true);
-        setOutput(result.compile_output.split("\n"));
-      } else {
+      const statusId = result.status.id;
+
+      // Correct Answer
+      if (statusId === 3) {
         setIsError(false);
         setOutput(result.stdout.split("\n"));
+
+        toast({
+          title: "Great job!",
+          description: "All cases passed!",
+          status: "success",
+          duration: 5000,
+          isClosable: true,
+        });
+
+        // Wrong Answer
+      } else if (statusId === 4) {
+        setIsError(false);
+        setOutput(result.stdout.split("\n"));
+        toast({
+          title: "One or more test cases failed",
+          description: "Please check your code.",
+          status: "error",
+          duration: 5000,
+          isClosable: true,
+        });
+
+        if(result.stderr === null & (result.stdout === null || result.stdout === "" || result.stdout === "\n")){
+          setOutput(["No output from the code"]);
+        }
+
+        // Compilation Error
+      } else if (statusId === 6) {
+        setIsError(true);
+        setOutput(result.compile_output.split("\n"));
+
+        // Time Limit Exceeded
+      } else if (statusId === 5) {
+        setIsError(true);
+        setOutput(["Time Limit Exceeded"]);
+
+        // Runtime Error and Internal Error
+      } else {
+        setIsError(true);
+        setOutput(result.stderr.split("\n"));
       }
-
-      // if (result.status.description === "Wrong Answer") {
-      //   setOutput(result.stdout.split("\n"));
-      //   toast({
-      //     title: "One or more test cases failed",
-      //     description: "Please check your code.",
-      //     status: "error",
-      //     duration: 5000,
-      //     isClosable: true,
-      //   });
-
-      // } else {
-      //   toast({
-      //     title: "Great job!",
-      //     description: "All cases passed!",
-      //     status: "success",
-      //     duration: 5000,
-      //     isClosable: true,
-      //   });
-      // }
     } catch (error) {
       console.log(error);
     } finally {
