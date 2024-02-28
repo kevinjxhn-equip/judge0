@@ -30,13 +30,13 @@ const CodeEditor = () => {
     <Box>
       <Question />
       <HStack>
-        <Box w={"50%"}>
+        <Box w={"60%"}>
           <LanguageSelector
             activeLanguage={activeLanguage}
             onSelect={onSelect}
           />
           <Editor
-            height="75vh"
+            height="65vh"
             theme="vs-dark"
             language={activeLanguage}
             defaultValue={CODE_SNIPPETS[activeLanguage]}

@@ -10,18 +10,17 @@ import {
 import React from "react";
 import {} from "@chakra-ui/react";
 import { LANGUAGE_VERSIONS } from "../utils/constants";
+import { ChevronDownIcon } from "@chakra-ui/icons";
 
 const languages = Object.entries(LANGUAGE_VERSIONS);
 
 const LanguageSelector = ({ activeLanguage, onSelect }) => {
   return (
     <Box ml={2} mb={2}>
-      <Text mb={2} fontSize={"lg"}>
-        Language:
-      </Text>
-
       <Menu isLazy>
-        <MenuButton mb={2} as={Button}>{activeLanguage}</MenuButton>
+        <MenuButton mb={2} as={Button} rightIcon={<ChevronDownIcon fontSize={"x-large"} />}>
+          {activeLanguage}
+        </MenuButton>
         <MenuList bg={"#110c1b"}>
           {languages.map(([language, version]) => (
             <MenuItem
