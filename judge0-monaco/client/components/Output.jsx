@@ -17,7 +17,7 @@ const Output = ({ editorRef, activeLanguage }) => {
     try {
       setIsLoading(true);
       const result = await executeCode(activeLanguage, sourceCode);
-      console.log(result);
+
       if (result.stderr) {
         setIsError(true);
         setOutput(result.stderr.split("\n"));
@@ -29,25 +29,25 @@ const Output = ({ editorRef, activeLanguage }) => {
         setOutput(result.stdout.split("\n"));
       }
 
-      if (result.status.description === "Wrong Answer") {
-        setOutput(result.stdout.split("\n"));
-        toast({
-          title: "One or more test cases failed",
-          description: "Please check your code.",
-          status: "error",
-          duration: 5000,
-          isClosable: true,
-        });
+      // if (result.status.description === "Wrong Answer") {
+      //   setOutput(result.stdout.split("\n"));
+      //   toast({
+      //     title: "One or more test cases failed",
+      //     description: "Please check your code.",
+      //     status: "error",
+      //     duration: 5000,
+      //     isClosable: true,
+      //   });
 
-      } else {
-        toast({
-          title: "Great job!",
-          description: "All cases passed!",
-          status: "success",
-          duration: 5000,
-          isClosable: true,
-        });
-      }
+      // } else {
+      //   toast({
+      //     title: "Great job!",
+      //     description: "All cases passed!",
+      //     status: "success",
+      //     duration: 5000,
+      //     isClosable: true,
+      //   });
+      // }
     } catch (error) {
       console.log(error);
     } finally {

@@ -15,6 +15,6 @@ export const executeCode = async (language, sourceCode) => {
       return submissionResponse.data;
     } catch (error) {
       console.error(error);
-      throw new Error("Error while sending code to server. Please try again.");
+      throw new Error("Error in the front end, we got a bad response.");
     }
 };

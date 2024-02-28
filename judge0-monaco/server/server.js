@@ -12,11 +12,7 @@ app.use(express.json());
 app.use(cors());
 
 const judge0Api = axios.create({
-  baseURL: "https://judge0-ce.p.rapidapi.com",
-  headers: {
-    "X-RapidAPI-Key": process.env.RAPIDAPI_KEY,
-    "X-RapidAPI-Host": process.env.RAPIDAPI_HOST,
-  },
+  baseURL: "http://127.0.0.1:2358",
 });
 
 // Main function to run the app
@@ -27,7 +23,6 @@ async function initializeApp() {
     const data = {
       language_id: langId,
       source_code: sourceCode,
-      expected_output: "Hello Raj",
     };
 
     try {
@@ -37,11 +32,8 @@ async function initializeApp() {
       let submissionResponse;
       do {
         submissionResponse = await judge0Api.get(`/submissions/${token}`);
-
-        if (submissionResponse.data.status.id <= 2) {
-          await new Promise((resolve) => setTimeout(resolve, 2000));
-        }
-
+        console.log(submissionResponse.data);
+        
       } while (submissionResponse.data.status.id <= 2);
 
       res.json(submissionResponse.data);

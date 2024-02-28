@@ -1,8 +1,8 @@
 export const LANGUAGE_VERSIONS = {
-  javascript: "18.15.0",
-  typescript: "5.0.3",
+  javascript: "Node.js 12.14.0",
+  typescript: "3.7.4",
   python: "3.8.1",
-  java: "JDK 17.0.6",
+  java: "13.0.1",
   csharp: "Mono 6.6.0.161",
   php: "7.4.1",
 };
@@ -17,12 +17,11 @@ export const CODE_SNIPPETS = {
   php: "<?php\n\n$name = 'Kevin';\necho $name;\n",
 };
 
-
 export const JUDGE0_LANGS_ID = {
-  javascript: "93",
-  typescript: "94",
+  javascript: "63",
+  typescript: "74",
   python: "71",
-  java: "91",
+  java: "62",
   csharp: "51",
   php: "68",
 };
