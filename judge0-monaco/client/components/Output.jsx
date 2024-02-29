@@ -22,7 +22,7 @@ const Output = ({ editorRef, activeLanguage }) => {
 
   const toast = useToast();
 
-  const runCode = async () => {
+  const runUserCode = async () => {
     const sourceCode = editorRef.current.getValue();
 
     if (!sourceCode) return;
@@ -50,7 +50,7 @@ const Output = ({ editorRef, activeLanguage }) => {
         // Wrong Answer
       } else if (statusId === 4) {
         setIsError(false);
-        setOutput(result.stdout.split("\n"));
+
         toast({
           title: "One or more test cases failed",
           description: "Please check your code.",
@@ -66,6 +66,8 @@ const Output = ({ editorRef, activeLanguage }) => {
             result.stdout === "\n")
         ) {
           setOutput(["No output from the code"]);
+        } else {
+          setOutput(result.stdout.split("\n"));
         }
 
         // Compilation Error
@@ -107,7 +109,7 @@ const Output = ({ editorRef, activeLanguage }) => {
             variant={"solid"}
             m={2}
             colorScheme="green"
-            onClick={runCode}
+            onClick={runUserCode}
             isLoading={isLoading}
           >
             <Flex align={"center"} gap={2}>

@@ -7,9 +7,9 @@ const CustomTestCaseSection = () => {
   const [isError, setIsError] = React.useState(false);
 
   return (
-    <Box p={2} w={"100%"} borderColor="gray.400" borderTop="1px" mt={3}>
-      <Flex justify={"flex-end"} gap={3} mb={2} mt={5}>
-        <Button colorScheme="telegram">
+    <Box py={2} w={"100%"} borderColor="gray.400" borderTop="1px" mt={3}>
+      <Flex justify={"flex-end"} gap={3} my={2}>
+        <Button colorScheme="telegram" m={2}>
           <Flex align={"center"} gap={2}>
             <CloudArrowUpIcon fontSize={"x-large"} />
             Run Custom Tests
@@ -17,11 +17,12 @@ const CustomTestCaseSection = () => {
         </Button>
       </Flex>
 
-      <Flex align={"flex-start"} padding={2} gap={5}>
+      <Flex align={"flex-start"} gap={5}>
         <Box flex={1}>
           <Textarea
             placeholder="Add a custom test case here..."
             minH={"13rem"}
+            variant={"filled"}
           />
         </Box>
         <Box
