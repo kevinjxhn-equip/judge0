@@ -10,7 +10,7 @@ import {
   Textarea,
 } from "@chakra-ui/react";
 import React from "react";
-import { executeCode } from "../utils/api";
+import { apiToTestBatch, executeCode } from "../utils/api";
 import TerminalIcon from "./TerminalIcon";
 import CodeBracketIcon from "./CodeBracketIcon";
 import CustomTestCaseSection from "./CustomTestCaseSection";
@@ -92,6 +92,18 @@ const Output = ({ editorRef, activeLanguage }) => {
     }
   };
 
+
+  const testBatch = async () => {
+    const sourceCode = editorRef.current.getValue();
+
+    try {
+      const result = await apiToTestBatch(activeLanguage, sourceCode);
+      
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
   return (
     <Box w={"50%"} mb={2}>
       <Flex>
@@ -105,6 +117,10 @@ const Output = ({ editorRef, activeLanguage }) => {
         <Spacer />
 
         <Box direction="row" spacing={4} align={"center"}>
+          <Button variant={"solid"} colorScheme="red" onClick={testBatch}>
+            Testing Batch
+          </Button>
+
           <Button
             variant={"solid"}
             m={2}
