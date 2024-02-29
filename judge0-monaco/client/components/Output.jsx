@@ -5,14 +5,15 @@ import {
   Spacer,
   Stack,
   Text,
-  Icon,
   useToast,
+  VStack,
+  Textarea,
 } from "@chakra-ui/react";
 import React from "react";
 import { executeCode } from "../utils/api";
 import TerminalIcon from "./TerminalIcon";
 import CodeBracketIcon from "./CodeBracketIcon";
-import CloudArrowUpIcon from "./CloudArrowUpIcon";
+import CustomTestCaseSection from "./CustomTestCaseSection";
 
 const Output = ({ editorRef, activeLanguage }) => {
   const [isLoading, setIsLoading] = React.useState(false);
@@ -91,23 +92,17 @@ const Output = ({ editorRef, activeLanguage }) => {
 
   return (
     <Box w={"50%"} mb={2}>
-      <Flex align={"center"}>
-        <Text fontSize={"x-large"} fontWeight={700}>
-          <Flex align={"center"} gap={2}>
-            <TerminalIcon fontSize={"xx-large"} mt={1} /> Terminal
-          </Flex>
-        </Text>
+      <Flex>
+        <Flex align={"center"} gap={2}>
+          <TerminalIcon fontSize={"xx-large"} mt={1} />
+          <Text fontSize={"x-large"} fontWeight={700}>
+            Terminal
+          </Text>
+        </Flex>
 
         <Spacer />
 
-        <Stack direction="row" spacing={4} align={"center"}>
-          <Button colorScheme="blue" variant="solid">
-            <Flex align={"center"} gap={2}>
-              <CodeBracketIcon fontSize={"x-large"} />
-              Run Tests
-            </Flex>
-          </Button>
-
+        <Box direction="row" spacing={4} align={"center"}>
           <Button
             variant={"solid"}
             m={2}
@@ -116,29 +111,36 @@ const Output = ({ editorRef, activeLanguage }) => {
             isLoading={isLoading}
           >
             <Flex align={"center"} gap={2}>
-              <CloudArrowUpIcon fontSize={"x-large"} />
-              Submit Code
+              <CodeBracketIcon fontSize={"x-large"} />
+              Run Your Code
             </Flex>
           </Button>
-        </Stack>
+        </Box>
       </Flex>
 
-      <Box
-        bg={"#1e283b"}
-        minH={"65vh"}
-        p={2}
-        mt={1}
-        border={"1px solid"}
-        borderRadius={4}
-        color={isError ? "red.400" : "#309F57"}
-        borderColor={isError ? "red.500" : "#333"}
-        overflowY={"scroll"}
-        fontWeight={600}
-      >
-        {output
-          ? output.map((line, i) => <Text key={i}>{line}</Text>)
-          : 'Click "Run Code" to see the output here'}
-      </Box>
+      <VStack>
+        <Box
+          w={"100%"}
+          bg={"#1e283b"}
+          minH={"31rem"}
+          p={2}
+          mt={1}
+          border={"1px solid"}
+          borderRadius={4}
+          color={isError ? "red.400" : "#309F57"}
+          borderColor={isError ? "red.500" : "#333"}
+          overflowY={"scroll"}
+          fontWeight={600}
+        >
+          {output
+            ? output.map((line, i) => <Text key={i}>{line}</Text>)
+            : 'Click "Run Your Code" to see the output here'}
+        </Box>
+
+        <Flex w={"100%"} gap={6} justify={"flex-start"}>
+          <CustomTestCaseSection />
+        </Flex>
+      </VStack>
     </Box>
   );
 };
