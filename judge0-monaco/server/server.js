@@ -48,10 +48,9 @@ async function initializeApp() {
   });
 
   app.post("/test-batch", async (req, res) => {
-    const data = req.body;
-    console.log(data);
+    console.log(req.body);
     try {
-      const response = await judge0Api.post("/submissions/batch", data);
+      const response = await judge0Api.post("/submissions/batch", req.body);
       const tokens = response.data.map((item) => item.token).join(",");
 
       let submissionResponse;

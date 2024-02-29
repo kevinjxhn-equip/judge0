@@ -23,25 +23,35 @@ export const executeCode = async (language, sourceCode) => {
 
     return submissionResponse.data;
   } catch (error) {
-    console.error(error);
     throw new Error("Error in the front end, we got a bad response.");
   }
 };
 
 export const apiToTestBatch = async (language, sourceCode) => {
-  const language_id = JUDGE0_LANGS_ID[language];
-  const source_code = sourceCode;
+  const langId = JUDGE0_LANGS_ID[language];
+  const sourceCode1 = `${sourceCode}\nconsole.log(firstCharacter("${TEST_CASES.inputTestCases[0]}"))`;
+  const sourceCode2 = `${sourceCode}\nconsole.log(firstCharacter("${TEST_CASES.inputTestCases[1]}"))`;
 
   try {
     const submissionResponse = await axios.post(`${baseUrl}/test-batch`, {
       submissions: [
-        { language_id, source_code },
-        { language_id, source_code },
+        {
+          language_id: langId,
+          source_code: sourceCode1,
+          expected_output: TEST_CASES.outputTestCases[0],
+          stdin: TEST_CASES.inputTestCases[0],
+        },
+        {
+          language_id: langId,
+          source_code: sourceCode2,
+          expected_output: TEST_CASES.outputTestCases[1],
+          stdin: TEST_CASES.inputTestCases[1],
+        },
       ],
     });
 
-    console.log(submissionResponse.data);
+    return submissionResponse.data;
   } catch (error) {
-    console.log(error);
+    throw new Error("Error in the front end, we got a bad response in batch testing.");
   }
 };

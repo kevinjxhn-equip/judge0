@@ -92,17 +92,38 @@ const Output = ({ editorRef, activeLanguage }) => {
     }
   };
 
-
   const testBatch = async () => {
     const sourceCode = editorRef.current.getValue();
 
     try {
+      setIsLoading(true);
       const result = await apiToTestBatch(activeLanguage, sourceCode);
-      
+      console.log(result);
+      const isPassed = result.submissions.every((item) => item.status.id === 3);
+
+      if (isPassed) {
+        toast({
+          title: "Great job!",
+          description: "All cases passed!",
+          status: "success",
+          duration: 5000,
+          isClosable: true,
+        });
+      } else {
+        toast({
+          title: "One or more test cases failed",
+          description: "Please check your code.",
+          status: "error",
+          duration: 5000,
+          isClosable: true,
+        });
+      }
     } catch (error) {
       console.log(error);
+    } finally {
+      setIsLoading(false);
     }
-  }
+  };
 
   return (
     <Box w={"50%"} mb={2}>
