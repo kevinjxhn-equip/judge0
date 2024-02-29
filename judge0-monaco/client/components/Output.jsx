@@ -43,7 +43,7 @@ const Output = ({ editorRef, activeLanguage }) => {
         activeLanguage,
         sourceCode
       );
-
+      console.log(result)
       const statusId = result.status.id;
 
       // Correct Answer
