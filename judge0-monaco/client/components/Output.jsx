@@ -124,7 +124,7 @@ const Output = ({ editorRef, activeLanguage }) => {
         <Box
           w={"100%"}
           bg={"#1e283b"}
-          minH={"31rem"}
+          minH={"20rem"}
           p={2}
           mt={1}
           border={"1px solid"}

@@ -37,7 +37,7 @@ const CodeEditor = () => {
           />
           <Box mt={3}>
             <Editor
-              height="50.5rem"
+              height="37rem"
               theme="vs-dark"
               language={activeLanguage}
               defaultValue={CODE_SNIPPETS[activeLanguage]}

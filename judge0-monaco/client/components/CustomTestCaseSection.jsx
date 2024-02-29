@@ -8,7 +8,7 @@ const CustomTestCaseSection = () => {
 
   return (
     <Box py={2} w={"100%"} borderColor="gray.400" borderTop="1px" mt={3}>
-      <Flex justify={"flex-end"} gap={3} my={2}>
+      <Flex justify={"flex-end"} gap={3} mt={2} mb={1}>
         <Button colorScheme="telegram" m={2}>
           <Flex align={"center"} gap={2}>
             <CloudArrowUpIcon fontSize={"x-large"} />
@@ -21,14 +21,14 @@ const CustomTestCaseSection = () => {
         <Box flex={1}>
           <Textarea
             placeholder="Add a custom test case here..."
-            minH={"13rem"}
+            minH={"11rem"}
             variant={"filled"}
           />
         </Box>
         <Box
           flex={1}
           bg={"#1e283b"}
-          minH={"13rem"}
+          minH={"11rem"}
           p={2}
           border={"1px solid"}
           borderRadius={4}
