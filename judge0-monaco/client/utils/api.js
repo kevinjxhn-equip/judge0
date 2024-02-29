@@ -3,7 +3,7 @@ import { JUDGE0_LANGS_ID, TEST_CASES } from "./constants";
 
 const baseUrl = "http://localhost:3000";
 
-export const executeCode = async (language, sourceCode) => {
+export const getResponseAfterExecutingUserCode = async (language, sourceCode) => {
   const langId = JUDGE0_LANGS_ID[language];
   const testInput = TEST_CASES.inputTestCases[0];
 
@@ -14,7 +14,7 @@ export const executeCode = async (language, sourceCode) => {
   }
 
   try {
-    const submissionResponse = await axios.post(`${baseUrl}/run-code`, {
+    const submissionResponse = await axios.post(`${baseUrl}/execute_user_code`, {
       langId,
       sourceCode,
       expected_output: TEST_CASES.outputTestCases[0],
@@ -23,17 +23,18 @@ export const executeCode = async (language, sourceCode) => {
 
     return submissionResponse.data;
   } catch (error) {
-    throw new Error("Error in the front end, we got a bad response.");
+    console.log(error);
+    throw new Error("Error while executing user's code.");
   }
 };
 
-export const apiToTestBatch = async (language, sourceCode) => {
+export const getResponseAfterSubmittingUserCode = async (language, sourceCode) => {
   const langId = JUDGE0_LANGS_ID[language];
   const sourceCode1 = `${sourceCode}\nconsole.log(firstCharacter("${TEST_CASES.inputTestCases[0]}"))`;
   const sourceCode2 = `${sourceCode}\nconsole.log(firstCharacter("${TEST_CASES.inputTestCases[1]}"))`;
 
   try {
-    const submissionResponse = await axios.post(`${baseUrl}/test-batch`, {
+    const submissionResponse = await axios.post(`${baseUrl}/submit_user_code`, {
       submissions: [
         {
           language_id: langId,
@@ -52,6 +53,7 @@ export const apiToTestBatch = async (language, sourceCode) => {
 
     return submissionResponse.data;
   } catch (error) {
-    throw new Error("Error in the front end, we got a bad response in batch testing.");
+    console.log(error);
+    throw new Error("Error while submitting user's code.");
   }
 };

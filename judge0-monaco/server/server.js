@@ -17,7 +17,9 @@ const judge0Api = axios.create({
 
 // Main function to run the app
 async function initializeApp() {
-  app.post("/run-code", async (req, res) => {
+
+  // Endpoint to execute user code
+  app.post("/execute_user_code", async (req, res) => {
     const { langId, sourceCode, expected_output, stdin } = req.body;
 
     const data = {
@@ -47,8 +49,8 @@ async function initializeApp() {
     }
   });
 
-  app.post("/test-batch", async (req, res) => {
-    console.log(req.body);
+  // Endpoint to submit user code
+  app.post("/submit_user_code", async (req, res) => {
     try {
       const response = await judge0Api.post("/submissions/batch", req.body);
       const tokens = response.data.map((item) => item.token).join(",");
@@ -74,6 +76,7 @@ async function initializeApp() {
     }
   });
 
+  // Start the server
   app.listen(port, () => {
     console.log(`App listening on port http://localhost:${port}/`);
   });

@@ -3,34 +3,46 @@ import {
   Button,
   Flex,
   Spacer,
-  Stack,
   Text,
   useToast,
   VStack,
-  Textarea,
 } from "@chakra-ui/react";
 import React from "react";
-import { apiToTestBatch, executeCode } from "../utils/api";
+import {
+  getResponseAfterSubmittingUserCode,
+  getResponseAfterExecutingUserCode,
+} from "../utils/api";
 import TerminalIcon from "./TerminalIcon";
 import CodeBracketIcon from "./CodeBracketIcon";
 import CustomTestCaseSection from "./CustomTestCaseSection";
+import RocketLaunchIcon from "./RocketLaunchIcon";
 
 const Output = ({ editorRef, activeLanguage }) => {
-  const [isLoading, setIsLoading] = React.useState(false);
   const [isError, setIsError] = React.useState(false);
   const [output, setOutput] = React.useState(null);
+  const [loadingState, setLoadingState] = React.useState({
+    isSubmitLoading: false,
+    isRunCodeLoading: false,
+    isRunCustomLoading: false,
+  });
 
   const toast = useToast();
 
-  const runUserCode = async () => {
+  const runUserCodeAndUpdateOutput = async () => {
     const sourceCode = editorRef.current.getValue();
 
     if (!sourceCode) return;
 
     try {
-      setIsLoading(true);
-      const result = await executeCode(activeLanguage, sourceCode);
-      console.log(result);
+      setLoadingState((prevState) => ({
+        ...prevState,
+        isRunCodeLoading: true,
+      }));
+
+      const result = await getResponseAfterExecutingUserCode(
+        activeLanguage,
+        sourceCode
+      );
 
       const statusId = result.status.id;
 
@@ -39,25 +51,9 @@ const Output = ({ editorRef, activeLanguage }) => {
         setIsError(false);
         setOutput(result.stdout.split("\n"));
 
-        toast({
-          title: "Great job!",
-          description: "All cases passed!",
-          status: "success",
-          duration: 5000,
-          isClosable: true,
-        });
-
         // Wrong Answer
       } else if (statusId === 4) {
         setIsError(false);
-
-        toast({
-          title: "One or more test cases failed",
-          description: "Please check your code.",
-          status: "error",
-          duration: 5000,
-          isClosable: true,
-        });
 
         if (
           (result.stderr === null) &
@@ -88,16 +84,24 @@ const Output = ({ editorRef, activeLanguage }) => {
     } catch (error) {
       console.log(error);
     } finally {
-      setIsLoading(false);
+      setLoadingState((prevState) => ({
+        ...prevState,
+        isRunCodeLoading: false,
+      }));
     }
   };
 
-  const testBatch = async () => {
+  const submitCode = async () => {
     const sourceCode = editorRef.current.getValue();
 
+    if (!sourceCode) return;
+
     try {
-      setIsLoading(true);
-      const result = await apiToTestBatch(activeLanguage, sourceCode);
+      setLoadingState((prevState) => ({ ...prevState, isSubmitLoading: true }));
+      const result = await getResponseAfterSubmittingUserCode(
+        activeLanguage,
+        sourceCode
+      );
       console.log(result);
       const isPassed = result.submissions.every((item) => item.status.id === 3);
 
@@ -121,7 +125,10 @@ const Output = ({ editorRef, activeLanguage }) => {
     } catch (error) {
       console.log(error);
     } finally {
-      setIsLoading(false);
+      setLoadingState((prevState) => ({
+        ...prevState,
+        isSubmitLoading: false,
+      }));
     }
   };
 
@@ -138,20 +145,28 @@ const Output = ({ editorRef, activeLanguage }) => {
         <Spacer />
 
         <Box direction="row" spacing={4} align={"center"}>
-          <Button variant={"solid"} colorScheme="red" onClick={testBatch}>
-            Testing Batch
-          </Button>
-
           <Button
             variant={"solid"}
             m={2}
             colorScheme="green"
-            onClick={runUserCode}
-            isLoading={isLoading}
+            onClick={runUserCodeAndUpdateOutput}
+            isLoading={loadingState.isRunCodeLoading}
           >
             <Flex align={"center"} gap={2}>
               <CodeBracketIcon fontSize={"x-large"} />
               Run Your Code
+            </Flex>
+          </Button>
+
+          <Button
+            variant={"solid"}
+            colorScheme="pink"
+            onClick={submitCode}
+            isLoading={loadingState.isSubmitLoading}
+          >
+            <Flex align={"center"} gap={2}>
+              <RocketLaunchIcon fontSize={"x-large"} />
+              Test All Cases
             </Flex>
           </Button>
         </Box>
