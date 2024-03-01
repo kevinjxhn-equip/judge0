@@ -62,7 +62,7 @@ const ProgrammingTestTemplate = () => {
                     bg="gray.200"
                     placement="right"
                     closeOnClick={true}
-                    openDelay={1000}
+                    openDelay={2000}
                   >
                     <Button
                       colorScheme="blackAlpha"
@@ -70,6 +70,7 @@ const ProgrammingTestTemplate = () => {
                       color={"black"}
                       _hover={{ color: "yellow.500" }}
                       onClick={() => setIsEditorDark(false)}
+                      cursor={"pointer"}
                     >
                       <SunIcon fontSize={"x-large"} />
                     </Button>
@@ -82,7 +83,7 @@ const ProgrammingTestTemplate = () => {
                     bg="gray.200"
                     placement="right"
                     closeOnClick={true}
-                    openDelay={1000}
+                    openDelay={2000}
                   >
                     <Button
                       colorScheme="blackAlpha"
@@ -90,6 +91,7 @@ const ProgrammingTestTemplate = () => {
                       color={"gray.500"}
                       _hover={{ color: "black" }}
                       onClick={() => setIsEditorDark(true)}
+                      cursor={"pointer"}
                     >
                       <MoonIcon fontSize={"large"} />
                     </Button>

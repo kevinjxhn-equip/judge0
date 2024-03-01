@@ -23,6 +23,7 @@ const LanguageSelector = ({ activeLanguage, onSelect }) => {
           as={Button}
           colorScheme="blackAlpha"
           rightIcon={<ChevronDownIcon fontSize={"x-large"} />}
+          cursor={"pointer"}
         >
           {activeLanguage}
         </MenuButton>
