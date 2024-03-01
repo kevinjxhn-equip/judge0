@@ -27,6 +27,6 @@ export const JUDGE0_LANGS_ID = {
 };
 
 export const TEST_CASES = {
-  inputTestCases: ["aaa", "bc"],
+  inputTestCases: [["aaa"], ["bc"]],
   outputTestCases: ["a", "b"],
 }

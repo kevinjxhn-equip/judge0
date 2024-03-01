@@ -20,15 +20,22 @@ const appendSourceCodeBasedOnLanguageAndFunctionName = (
     php: "echo",
   };
 
+  const serializeArgument = (arg) => {
+    if (typeof arg === "string") return `"${arg}"`;
+    if (Array.isArray(arg)) return `[${arg.map(serializeArgument).join(", ")}]`;
+    if (typeof arg === "object") return JSON.stringify(arg);
+    return arg.toString();
+  };
+
   for (let inputTestCase of inputTestCases) {
     const printFunction = languagePrintFunction[language];
-    const printStatement =
-      typeof inputTestCase === "string" ? `"${inputTestCase}"` : inputTestCase;
-    const sourceCodeLine = `${sourceCode}\n${printFunction}(${functionName}(${printStatement}))`;
+    const args = Array.isArray(inputTestCase) ? inputTestCase.map(serializeArgument) : [serializeArgument(inputTestCase)];
+    const sourceCodeLine = `${sourceCode}\n${printFunction}(${functionName}(${args.join(", ")}))`;
     sourceCodeArray.push(sourceCodeLine);
   }
   return sourceCodeArray;
 };
+
 
 export const getResponseAfterExecutingUserCode = async (
   language,
