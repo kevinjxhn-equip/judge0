@@ -1,6 +1,13 @@
 import React from "react";
 import { Editor } from "@monaco-editor/react";
-import { Box, Button, ButtonGroup, Container, Flex } from "@chakra-ui/react";
+import {
+  Box,
+  Button,
+  ButtonGroup,
+  Container,
+  Flex,
+  Tooltip,
+} from "@chakra-ui/react";
 import LanguageSelector from "./LanguageSelector";
 import { CODE_SNIPPETS } from "../utils/constants";
 import Output from "./Output";
@@ -38,7 +45,7 @@ const ProgrammingTestTemplate = () => {
           <QuestionSection />
         </Box>
 
-        <Flex w={"100%"} gap={5} direction={"column"}>
+        <Flex w={"70%"} gap={5} direction={"column"}>
           <Box>
             <Flex gap={2} p={1}>
               <LanguageSelector
@@ -48,32 +55,52 @@ const ProgrammingTestTemplate = () => {
 
               <ButtonGroup>
                 {isEditorDark ? (
-                  <Button
-                    colorScheme="blackAlpha"
-                    variant={"ghost"}
-                    color={"black"}
-                    _hover={{ color: "yellow.500" }}
-                    onClick={() => setIsEditorDark(false)}
+                  <Tooltip
+                    label="Changes Code Editor to Light Mode"
+                    hasArrow
+                    aria-label="Light Mode"
+                    bg="gray.200"
+                    placement="right"
+                    closeOnClick={true}
+                    openDelay={1000}
                   >
-                    <SunIcon fontSize={"x-large"} />
-                  </Button>
+                    <Button
+                      colorScheme="blackAlpha"
+                      variant={"ghost"}
+                      color={"black"}
+                      _hover={{ color: "yellow.500" }}
+                      onClick={() => setIsEditorDark(false)}
+                    >
+                      <SunIcon fontSize={"x-large"} />
+                    </Button>
+                  </Tooltip>
                 ) : (
-                  <Button
-                    colorScheme="blackAlpha"
-                    variant={"ghost"}
-                    color={"gray.500"}
-                    _hover={{ color: "black" }}
-                    onClick={() => setIsEditorDark(true)}
+                  <Tooltip
+                    label="Changes Code Editor to Dark Mode"
+                    hasArrow
+                    aria-label="Dark Mode"
+                    bg="gray.200"
+                    placement="right"
+                    closeOnClick={true}
+                    openDelay={1000}
                   >
-                    <MoonIcon fontSize={"large"} />
-                  </Button>
+                    <Button
+                      colorScheme="blackAlpha"
+                      variant={"ghost"}
+                      color={"gray.500"}
+                      _hover={{ color: "black" }}
+                      onClick={() => setIsEditorDark(true)}
+                    >
+                      <MoonIcon fontSize={"large"} />
+                    </Button>
+                  </Tooltip>
                 )}
               </ButtonGroup>
             </Flex>
 
             <Box borderTop={"1px"} borderBottom={"1px"} borderColor={"#d1d5da"}>
               <Editor
-                height="37rem"
+                height={"50vh"}
                 theme={isEditorDark ? "vs-dark" : "vs-light"}
                 language={activeLanguage}
                 defaultValue={CODE_SNIPPETS[activeLanguage]}
