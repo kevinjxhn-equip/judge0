@@ -16,8 +16,9 @@ import TerminalIcon from "./TerminalIcon";
 import CodeBracketIcon from "./CodeBracketIcon";
 import CustomTestCaseSection from "./CustomTestCaseSection";
 import RocketLaunchIcon from "./RocketLaunchIcon";
+import { editorRefProvider, languageProvider } from "./CodeEditor";
 
-const Output = ({ editorRef, activeLanguage }) => {
+const Output = () => {
   const [isError, setIsError] = React.useState(false);
   const [output, setOutput] = React.useState(null);
   const [loadingState, setLoadingState] = React.useState({
@@ -25,6 +26,9 @@ const Output = ({ editorRef, activeLanguage }) => {
     isRunCodeLoading: false,
     isRunCustomLoading: false,
   });
+
+  const editorRef = React.useContext(editorRefProvider);
+  const activeLanguage = React.useContext(languageProvider);
 
   const toast = useToast();
 
@@ -43,7 +47,7 @@ const Output = ({ editorRef, activeLanguage }) => {
         activeLanguage,
         sourceCode
       );
-      console.log(result)
+      console.log(result);
       const statusId = result.status.id;
 
       // Correct Answer

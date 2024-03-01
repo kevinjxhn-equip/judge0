@@ -3,7 +3,7 @@ import { Box, Button, Flex, Textarea } from "@chakra-ui/react";
 import CloudArrowUpIcon from "./CloudArrowUpIcon";
 
 const CustomTestCaseSection = () => {
-  const [output, setOutput] = React.useState(null);
+  const [customTestCaseOutput, setCustomTestCaseOutput] = React.useState(null);
   const [isError, setIsError] = React.useState(false);
 
   return (
@@ -37,8 +37,8 @@ const CustomTestCaseSection = () => {
           overflowY={"scroll"}
           fontWeight={600}
         >
-          {output
-            ? output.map((line, i) => <Text key={i}>{line}</Text>)
+          {customTestCaseOutput
+            ? customTestCaseOutput.map((line, i) => <Text key={i}>{line}</Text>)
             : 'Click "Run Custom Tests" to see the output here'}
         </Box>
       </Flex>

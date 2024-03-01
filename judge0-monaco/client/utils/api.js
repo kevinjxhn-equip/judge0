@@ -47,7 +47,7 @@ export const getResponseAfterExecutingUserCode = async (
   const sourceCodeArray = appendSourceCodeBasedOnLanguageAndFunctionName(
     language,
     sourceCode,
-    "firstCharacter",
+    language === "python" ? "first_character" : "firstCharacter",
     testInput
   );
 
@@ -78,7 +78,7 @@ export const getResponseAfterSubmittingUserCode = async (
   const sourceCodeArray = appendSourceCodeBasedOnLanguageAndFunctionName(
     language,
     sourceCode,
-    "firstCharacter",
+    language === "python" ? "first_character" : "firstCharacter",
     TEST_CASES.inputTestCases
   );
   const submissions = sourceCodeArray.map((sourceCode, index) => ({

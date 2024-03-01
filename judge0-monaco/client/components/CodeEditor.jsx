@@ -6,6 +6,9 @@ import { CODE_SNIPPETS } from "../utils/constants";
 import Output from "./Output";
 import Question from "./Question";
 
+export const editorRefProvider = React.createContext();
+export const languageProvider = React.createContext();
+
 const CodeEditor = () => {
   const [value, setValue] = React.useState("");
   const [activeLanguage, setActiveLanguage] = React.useState("javascript");
@@ -47,7 +50,11 @@ const CodeEditor = () => {
             />
           </Box>
         </Box>
-        <Output editorRef={editorRef} activeLanguage={activeLanguage} />
+        <languageProvider.Provider value={activeLanguage}>
+          <editorRefProvider.Provider value={editorRef}>
+            <Output />
+          </editorRefProvider.Provider>
+        </languageProvider.Provider>
       </Flex>
     </Container>
   );
