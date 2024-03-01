@@ -176,7 +176,7 @@ const Output = () => {
         <ButtonGroup>
           <Button
             variant={"solid"}
-            colorScheme="purple"
+            colorScheme="orange"
             onClick={submitCode}
             isLoading={loadingState.isSubmitLoading}
           >
