@@ -24,7 +24,6 @@ const Output = () => {
   const [loadingState, setLoadingState] = React.useState({
     isSubmitLoading: false,
     isRunCodeLoading: false,
-    isRunCustomLoading: false,
   });
 
   const editorRef = React.useContext(editorRefProvider);
@@ -83,10 +82,8 @@ const Output = () => {
         setIsError(true);
         setOutput(result.stderr.split("\n"));
       }
-      
     } catch (error) {
       console.log(error);
-      
     } finally {
       setLoadingState((prevState) => ({
         ...prevState,

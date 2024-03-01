@@ -29,13 +29,16 @@ const appendSourceCodeBasedOnLanguageAndFunctionName = (
 
   for (let inputTestCase of inputTestCases) {
     const printFunction = languagePrintFunction[language];
-    const args = Array.isArray(inputTestCase) ? inputTestCase.map(serializeArgument) : [serializeArgument(inputTestCase)];
-    const sourceCodeLine = `${sourceCode}\n${printFunction}(${functionName}(${args.join(", ")}))`;
+    const args = Array.isArray(inputTestCase)
+      ? inputTestCase.map(serializeArgument)
+      : [serializeArgument(inputTestCase)];
+    const sourceCodeLine = `${sourceCode}\n${printFunction}(${functionName}(${args.join(
+      ", "
+    )}))`;
     sourceCodeArray.push(sourceCodeLine);
   }
   return sourceCodeArray;
 };
-
 
 export const getResponseAfterExecutingUserCode = async (
   language,
@@ -97,5 +100,48 @@ export const getResponseAfterSubmittingUserCode = async (
   } catch (error) {
     console.log(error);
     throw new Error("Error while submitting user's code.");
+  }
+};
+
+export const getResponseAfterExecutingUserCustomInputCode = async (
+  language,
+  sourceCode,
+  customInput
+) => {
+  const langId = JUDGE0_LANGS_ID[language];
+
+  console.log(typeof customInput, customInput);
+
+  // We need it in the form of an array
+  let formattedCustomInput = [customInput];
+  
+  try {
+    formattedCustomInput = JSON.parse(customInput);
+  } catch (error) {
+    console.error("Error parsing custom input, caught", error);
+    return { error: "Invalid custom input format" };
+  }
+
+  const sourceCodeArray = appendSourceCodeBasedOnLanguageAndFunctionName(
+    language,
+    sourceCode,
+    language === "python" ? "first_character" : "firstCharacter",
+    formattedCustomInput
+  );
+
+  try {
+    const submissionResponse = await axios.post(
+      `${baseUrl}/execute_user_code`,
+      {
+        langId,
+        sourceCode: sourceCodeArray[0],
+        stdin: customInput,
+      }
+    );
+
+    return submissionResponse.data;
+  } catch (error) {
+    console.log(error);
+    throw new Error("Error while executing user's custom input code.");
   }
 };
