@@ -26,6 +26,11 @@ const appendSourceCodeBasedOnLanguageAndFunctionName = (
     if (typeof arg === "object") return JSON.stringify(arg);
     return arg.toString();
   };
+  
+  // Convert single inputTestCase to an array if it's not already an array
+  if (!Array.isArray(inputTestCases)) {
+    inputTestCases = [inputTestCases];
+  }
 
   for (let inputTestCase of inputTestCases) {
     const printFunction = languagePrintFunction[language];
@@ -114,7 +119,7 @@ export const getResponseAfterExecutingUserCustomInputCode = async (
 
   // We need it in the form of an array
   let formattedCustomInput = [customInput];
-  
+
   try {
     formattedCustomInput = JSON.parse(customInput);
   } catch (error) {
