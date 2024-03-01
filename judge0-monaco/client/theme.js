@@ -5,9 +5,5 @@ const theme = extendTheme({
     initialColorMode: "light",
     useSystemColorMode: false,
   },
-  fonts: {
-    body: `'Open Sans', sans-serif`,
-    body: `'Lato', sans-serif`,
-  },
 });
 export default theme;

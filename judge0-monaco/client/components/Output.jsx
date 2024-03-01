@@ -1,8 +1,10 @@
 import {
   Box,
   Button,
+  ButtonGroup,
   Flex,
   Spacer,
+  Stack,
   Text,
   useToast,
   VStack,
@@ -134,11 +136,8 @@ const Output = () => {
   };
 
   return (
-    <Box w={"50%"} mb={2}>
-      <Flex>
-
-        <Box direction="row" spacing={4} align={"center"}>
-          <Button
+    <Box mb={2}>
+      {/* <Button
             variant={"solid"}
             m={2}
             colorScheme="green"
@@ -149,20 +148,45 @@ const Output = () => {
               <CodeBracketIcon fontSize={"x-large"} />
               Run Your Code
             </Flex>
+          </Button> */}
+
+      <Flex justifyContent={"space-between"} px={2}>
+        <ButtonGroup spacing={0}>
+          <Button
+            variant={"solid"}
+            colorScheme="messenger"
+            borderRadius={8}
+            borderBottomRightRadius={"none"}
+            borderBottomLeftRadius={"none"}
+          >
+            Sample Input Testcases
           </Button>
 
           <Button
             variant={"solid"}
-            colorScheme="pink"
+            colorScheme="blackAlpha"
+            borderRadius={8}
+            borderBottomRightRadius={"none"}
+            borderBottomLeftRadius={"none"}
+          >
+            Custom Input Testcases
+          </Button>
+        </ButtonGroup>
+
+        <ButtonGroup>
+          <Button
+            variant={"solid"}
+            colorScheme="purple"
             onClick={submitCode}
             isLoading={loadingState.isSubmitLoading}
           >
-            <Flex align={"center"} gap={2}>
-              <RocketLaunchIcon fontSize={"x-large"} />
-              Test All Cases
-            </Flex>
+            Run Tests
           </Button>
-        </Box>
+
+          <Button variant={"solid"} colorScheme="whatsapp">
+            Submit
+          </Button>
+        </ButtonGroup>
       </Flex>
 
       <VStack>
