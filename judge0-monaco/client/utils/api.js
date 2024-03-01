@@ -10,7 +10,7 @@ const appendSourceCodeBasedOnLanguageAndFunctionName = (
   inputTestCases
 ) => {
   const sourceCodeArray = [];
-  console.log(inputTestCases);
+
   const languagePrintFunction = {
     javascript: "console.log",
     python: "print",
@@ -67,25 +67,23 @@ export const getResponseAfterSubmittingUserCode = async (
   sourceCode
 ) => {
   const langId = JUDGE0_LANGS_ID[language];
-  const sourceCode1 = `${sourceCode}\nconsole.log(firstCharacter("${TEST_CASES.inputTestCases[0]}"))`;
-  const sourceCode2 = `${sourceCode}\nconsole.log(firstCharacter("${TEST_CASES.inputTestCases[1]}"))`;
+
+  const sourceCodeArray = appendSourceCodeBasedOnLanguageAndFunctionName(
+    language,
+    sourceCode,
+    "firstCharacter",
+    TEST_CASES.inputTestCases
+  );
+  const submissions = sourceCodeArray.map((sourceCode, index) => ({
+    language_id: langId,
+    source_code: sourceCode,
+    expected_output: TEST_CASES.outputTestCases[index],
+    stdin: TEST_CASES.inputTestCases[index],
+  }));
 
   try {
     const submissionResponse = await axios.post(`${baseUrl}/submit_user_code`, {
-      submissions: [
-        {
-          language_id: langId,
-          source_code: sourceCode1,
-          expected_output: TEST_CASES.outputTestCases[0],
-          stdin: TEST_CASES.inputTestCases[0],
-        },
-        {
-          language_id: langId,
-          source_code: sourceCode2,
-          expected_output: TEST_CASES.outputTestCases[1],
-          stdin: TEST_CASES.inputTestCases[1],
-        },
-      ],
+      submissions: submissions,
     });
 
     return submissionResponse.data;
