@@ -60,10 +60,8 @@ const Output = () => {
         setIsError(false);
 
         if (
-          (result.stderr === null) &
-          (result.stdout === null ||
-            result.stdout === "" ||
-            result.stdout === "\n")
+          result.stderr === null &&
+          (!result.stdout || result.stdout.trim() === "")
         ) {
           setOutput(["No output from the code"]);
         } else {
@@ -85,8 +83,10 @@ const Output = () => {
         setIsError(true);
         setOutput(result.stderr.split("\n"));
       }
+      
     } catch (error) {
       console.log(error);
+      
     } finally {
       setLoadingState((prevState) => ({
         ...prevState,
