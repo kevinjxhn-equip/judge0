@@ -16,7 +16,7 @@ import TerminalIcon from "./TerminalIcon";
 import CodeBracketIcon from "./CodeBracketIcon";
 import CustomTestCaseSection from "./CustomTestCaseSection";
 import RocketLaunchIcon from "./RocketLaunchIcon";
-import { editorRefProvider, languageProvider } from "./CodeEditor";
+import { editorRefProvider, languageProvider } from "./ProgrammingTestTemplate";
 
 const Output = () => {
   const [isError, setIsError] = React.useState(false);
@@ -136,14 +136,6 @@ const Output = () => {
   return (
     <Box w={"50%"} mb={2}>
       <Flex>
-        <Flex align={"center"} gap={2}>
-          <TerminalIcon fontSize={"xx-large"} mt={1} />
-          <Text fontSize={"x-large"} fontWeight={700}>
-            Terminal
-          </Text>
-        </Flex>
-
-        <Spacer />
 
         <Box direction="row" spacing={4} align={"center"}>
           <Button

@@ -1,7 +1,7 @@
 import React from "react";
 import { Box, Button, Flex, Text, Textarea } from "@chakra-ui/react";
 import CloudArrowUpIcon from "./CloudArrowUpIcon";
-import { editorRefProvider, languageProvider } from "./CodeEditor";
+import { editorRefProvider, languageProvider } from "./ProgrammingTestTemplate";
 import { getResponseAfterExecutingUserCustomInputCode } from "../utils/api";
 
 const CustomTestCaseSection = () => {
@@ -28,7 +28,7 @@ const CustomTestCaseSection = () => {
         customInput
       );
 
-      if(result.error) {
+      if (result.error) {
         setIsError(true);
         setCustomTestCaseOutput(["Incorrect input format."]);
         return;

@@ -18,17 +18,22 @@ const LanguageSelector = ({ activeLanguage, onSelect }) => {
   return (
     <Box ml={2} mb={2}>
       <Menu isLazy>
-        <MenuButton mb={2} as={Button} rightIcon={<ChevronDownIcon fontSize={"x-large"} />}>
+        <MenuButton
+          mb={2}
+          as={Button}
+          colorScheme="blackAlpha"
+          rightIcon={<ChevronDownIcon fontSize={"x-large"} />}
+        >
           {activeLanguage}
         </MenuButton>
-        <MenuList bg={"#110c1b"}>
+        <MenuList bg="white">
           {languages.map(([language, version]) => (
             <MenuItem
               key={language}
               onClick={() => onSelect(language)}
-              color={activeLanguage === language ? "blue.400" : ""}
-              bg={activeLanguage === language ? "gray.700" : ""}
-              _hover={{ bg: "gray.800", color: "blue.400" }}
+              color={activeLanguage === language ? "blue.400" : "gray.600"}
+              bg={activeLanguage === language ? "gray.100" : ""}
+              _hover={{ bg: "gray.100", color: "blue.400" }}
             >
               {language}
               &nbsp;

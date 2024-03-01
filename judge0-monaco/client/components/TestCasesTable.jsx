@@ -1,5 +1,6 @@
 import {
   Box,
+  Divider,
   Flex,
   Table,
   TableCaption,
@@ -13,15 +14,18 @@ import {
 import React from "react";
 
 const TestCasesTable = () => {
-
   return (
-    <TableContainer width={"100%"} border={"1px"} p={2}>
-      <Table variant="simple">
-        <TableCaption>TEST CASES</TableCaption>
+    <TableContainer
+      border={"1px"}
+      p={2}
+      pb={7}
+      borderColor={"#d1d5da"}
+    >
+      <Table>
         <Thead>
           <Tr>
-            <Th>INPUT</Th>
-            <Th>OUTPUT</Th>
+            <Th color={"gray.800"}>INPUT</Th>
+            <Th color={"gray.800"}>OUTPUT</Th>
           </Tr>
         </Thead>
         <Tbody>
