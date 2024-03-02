@@ -3,8 +3,6 @@ import {
   Button,
   ButtonGroup,
   Flex,
-  Spacer,
-  Stack,
   Text,
   useToast,
   VStack,
@@ -14,20 +12,24 @@ import {
   getResponseAfterSubmittingUserCode,
   getResponseAfterExecutingUserCode,
 } from "../utils/api";
-import TerminalIcon from "./TerminalIcon";
-import CodeBracketIcon from "./CodeBracketIcon";
 import CustomTestCaseSection from "./CustomTestCaseSection";
-import RocketLaunchIcon from "./RocketLaunchIcon";
 import { editorRefProvider, languageProvider } from "./ProgrammingTestTemplate";
+import { getResponseAfterExecutingUserCustomInputCode } from "../utils/api";
 
 const Output = () => {
   const [isError, setIsError] = React.useState(false);
   const [output, setOutput] = React.useState(null);
   const [isCustomTestCaseSectionVisible, setIsCustomTestCaseSectionVisible] =
     React.useState(false);
+
+  const [customInput, setCustomInput] = React.useState("");
+  const [isCustomError, setIsCustomError] = React.useState(false);
+  const [customTestCaseOutput, setCustomTestCaseOutput] = React.useState(null);
+
   const [loadingState, setLoadingState] = React.useState({
     isSubmitLoading: false,
     isRunCodeLoading: false,
+    isCustomTestLoading: false,
   });
 
   const editorRef = React.useContext(editorRefProvider);
@@ -92,6 +94,74 @@ const Output = () => {
       setLoadingState((prevState) => ({
         ...prevState,
         isRunCodeLoading: false,
+      }));
+    }
+  };
+
+  const runCustomTestCase = async () => {
+    const sourceCode = editorRef.current.getValue();
+
+    if (!sourceCode) return;
+
+    try {
+      setLoadingState((prevState) => ({
+        ...prevState,
+        isCustomTestLoading: true,
+      }));
+
+      const result = await getResponseAfterExecutingUserCustomInputCode(
+        activeLanguage,
+        sourceCode,
+        customInput
+      );
+
+      if (result.error) {
+        setIsCustomError(true);
+        setCustomTestCaseOutput(["Incorrect input format."]);
+        return;
+      }
+
+      const statusId = result.status.id;
+
+      // Correct Answer
+      if (statusId === 3) {
+        setIsCustomError(false);
+        setCustomTestCaseOutput(result.stdout.split("\n"));
+
+        // Wrong Answer
+      } else if (statusId === 4) {
+        setIsCustomError(false);
+
+        if (
+          result.stderr === null &&
+          (!result.stdout || result.stdout.trim() === "")
+        ) {
+          setCustomTestCaseOutput(["No output from the code"]);
+        } else {
+          setCustomTestCaseOutput(result.stdout.split("\n"));
+        }
+
+        // Compilation Error
+      } else if (statusId === 6) {
+        setIsCustomError(true);
+        setCustomTestCaseOutput(result.compile_output.split("\n"));
+
+        // Time Limit Exceeded
+      } else if (statusId === 5) {
+        setIsCustomError(true);
+        setCustomTestCaseOutput(["Time Limit Exceeded"]);
+
+        // Runtime Error and Internal Error
+      } else {
+        setIsCustomError(true);
+        setCustomTestCaseOutput(result.stderr.split("\n"));
+      }
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoadingState((prevState) => ({
+        ...prevState,
+        isCustomTestLoading: false,
       }));
     }
   };
@@ -182,14 +252,26 @@ const Output = () => {
         </ButtonGroup>
 
         <ButtonGroup>
-          <Button
-            variant={"solid"}
-            colorScheme="purple"
-            onClick={submitCode}
-            isLoading={loadingState.isSubmitLoading}
-          >
-            Run Tests
-          </Button>
+          {isCustomTestCaseSectionVisible ? (
+            <Button
+              colorScheme="purple"
+              onClick={runCustomTestCase}
+              isLoading={loadingState.isCustomTestLoading}
+            >
+              <Flex align={"center"} gap={2}>
+                Run Custom Tests
+              </Flex>
+            </Button>
+          ) : (
+            <Button
+              variant={"solid"}
+              colorScheme="purple"
+              onClick={submitCode}
+              isLoading={loadingState.isSubmitLoading}
+            >
+              Run Tests
+            </Button>
+          )}
 
           <Button variant={"solid"} colorScheme="whatsapp">
             Submit
@@ -197,28 +279,36 @@ const Output = () => {
         </ButtonGroup>
       </Flex>
 
-      <VStack>
-        <Box
-          w={"100%"}
-          bg={"#1e283b"}
-          minH={"20rem"}
-          p={2}
-          mt={1}
-          borderRadius={4}
-          color={isError ? "red.400" : "#309F57"}
-          borderColor={isError ? "red.500" : "#333"}
-          overflowY={"scroll"}
-          fontWeight={600}
-        >
-          {output
-            ? output.map((line, i) => <Text key={i}>{line}</Text>)
-            : 'Click "Run Your Code" to see the output here'}
-        </Box>
-
-        <Flex w={"100%"} gap={6} justify={"flex-start"}>
-          <CustomTestCaseSection />
-        </Flex>
-      </VStack>
+      <Box mt={3}>
+        {/* This needs to change */}
+        {isCustomTestCaseSectionVisible ? (
+          <Flex w={"100%"} gap={6} justify={"flex-start"}>
+            <CustomTestCaseSection
+              customTestCaseOutput={customTestCaseOutput}
+              isCustomError={isCustomError}
+              customInput={customInput}
+              setCustomInput={setCustomInput}
+            />
+          </Flex>
+        ) : (
+          <Box
+            w={"100%"}
+            bg={"#1e283b"}
+            minH={"10rem"}
+            p={2}
+            mt={1}
+            borderRadius={4}
+            color={isError ? "red.400" : "#309F57"}
+            borderColor={isError ? "red.500" : "#333"}
+            overflowY={"scroll"}
+            fontWeight={600}
+          >
+            {output
+              ? output.map((line, i) => <Text key={i}>{line}</Text>)
+              : 'Click "Run Your Code" to see the output here'}
+          </Box>
+        )}
+      </Box>
     </Box>
   );
 };
