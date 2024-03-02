@@ -23,6 +23,8 @@ import { editorRefProvider, languageProvider } from "./ProgrammingTestTemplate";
 const Output = () => {
   const [isError, setIsError] = React.useState(false);
   const [output, setOutput] = React.useState(null);
+  const [isCustomTestCaseSectionVisible, setIsCustomTestCaseSectionVisible] =
+    React.useState(false);
   const [loadingState, setLoadingState] = React.useState({
     isSubmitLoading: false,
     isRunCodeLoading: false,
@@ -154,20 +156,26 @@ const Output = () => {
         <ButtonGroup spacing={0}>
           <Button
             variant={"solid"}
-            colorScheme="messenger"
+            colorScheme={
+              isCustomTestCaseSectionVisible ? "blackAlpha" : "messenger"
+            }
             borderRadius={8}
             borderBottomRightRadius={"none"}
             borderBottomLeftRadius={"none"}
+            onClick={() => setIsCustomTestCaseSectionVisible(false)}
           >
             Sample Input Testcases
           </Button>
 
           <Button
             variant={"solid"}
-            colorScheme="blackAlpha"
+            colorScheme={
+              isCustomTestCaseSectionVisible ? "messenger" : "blackAlpha"
+            }
             borderRadius={8}
             borderBottomRightRadius={"none"}
             borderBottomLeftRadius={"none"}
+            onClick={() => setIsCustomTestCaseSectionVisible(true)}
           >
             Custom Input Testcases
           </Button>
@@ -176,7 +184,7 @@ const Output = () => {
         <ButtonGroup>
           <Button
             variant={"solid"}
-            colorScheme="orange"
+            colorScheme="purple"
             onClick={submitCode}
             isLoading={loadingState.isSubmitLoading}
           >
@@ -196,7 +204,6 @@ const Output = () => {
           minH={"20rem"}
           p={2}
           mt={1}
-          border={"1px solid"}
           borderRadius={4}
           color={isError ? "red.400" : "#309F57"}
           borderColor={isError ? "red.500" : "#333"}

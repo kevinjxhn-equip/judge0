@@ -34,10 +34,6 @@ const ProgrammingTestTemplate = () => {
     setValue(CODE_SNIPPETS[activeLanguage]);
   };
 
-  React.useEffect(() => {
-    console.log(activeLanguage);
-  }, [activeLanguage]);
-
   return (
     <Container maxW={"9xl"}>
       <Flex>
