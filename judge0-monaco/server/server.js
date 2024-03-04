@@ -2,6 +2,7 @@ import express from "express";
 import dotenv from "dotenv";
 import cors from "cors";
 import axios from "axios";
+import bodyParser from "body-parser";
 
 dotenv.config();
 
@@ -10,14 +11,34 @@ const port = process.env.SERVER_PORT || 3000;
 
 app.use(express.json());
 app.use(cors());
+app.use(bodyParser.json());
 
 const judge0Api = axios.create({
   baseURL: "http://127.0.0.1:2358",
 });
 
+let submissionResultData = null;
+
+// We get the data from Judge0 in base64 encoded format when we use the webhook, so we need to decode it
+const decodeBase64 = (data) => {
+  const decodedData = {};
+  for (const key in data) {
+    if (typeof data[key] === "string" && data[key].trim().endsWith("=")) {
+      try {
+        decodedData[key] = Buffer.from(data[key], "base64").toString("utf-8");
+      } catch (error) {
+        // If decoding fails, keep the original value
+        decodedData[key] = data[key];
+      }
+    } else {
+      decodedData[key] = data[key];
+    }
+  }
+  return decodedData;
+};
+
 // Main function to run the app
 async function initializeApp() {
-
   // Endpoint to execute user code
   app.post("/execute_user_code", async (req, res) => {
     const { langId, sourceCode, expected_output, stdin } = req.body;
@@ -25,28 +46,52 @@ async function initializeApp() {
     const data = {
       language_id: langId,
       source_code: sourceCode,
-      stdin,
-      expected_output,
+      callback_url: `http://host.docker.internal:${port}/judge0_webhook`,
+      // stdin,
+      // expected_output,
     };
 
     try {
-      const response = await judge0Api.post("/submissions", data);
-      const token = response.data.token;
+      await judge0Api.post("/submissions", data);
 
-      let submissionResponse;
-      do {
-        submissionResponse = await judge0Api.get(`/submissions/${token}`);
-        console.log(submissionResponse.data);
-
-        if (submissionResponse.data.status.id <= 2) {
-          await new Promise((resolve) => setTimeout(resolve, 1000));
-        }
-      } while (submissionResponse.data.status.id <= 2);
-
-      res.json(submissionResponse.data);
+      res.status(200).json({ message: "Code execution started successfully." });
     } catch (error) {
       res.status(500).json({ error: error.message });
     }
+  });
+
+  // Endpoint to handle webhook notifications from Judge0
+  app.put("/judge0_webhook", (req, res) => {
+    submissionResultData = decodeBase64(req.body);
+
+    console.log("submissionResultData", submissionResultData);
+
+    res.status(200).json({ message: "Webhook recieved successfully." });
+  });
+
+  const handleSubmissionResultSSE = (res) => {
+    // Setting headers for Server Sent Events
+    res.setHeader("Content-Type", "text/event-stream");
+    res.setHeader("Cache-Control", "no-cache");
+    res.setHeader("Connection", "keep-alive");
+
+    // Example logic to emit SSE events periodically
+    const intervalId = setInterval(() => {
+      if (submissionResultData) {
+        res.write(`data: ${JSON.stringify(submissionResultData)}\n\n`);
+        submissionResultData = null;
+      }
+    }, 5000); // Emit SSE events every 5 seconds
+
+    // Handle client disconnect
+    res.on("close", () => {
+      clearInterval(intervalId); // Stop emitting SSE events when client disconnects
+      console.log("Client disconnected");
+    });
+  };
+  // Endpoint to stream submission result data via SSE
+  app.get("/judge0_webhook_sse", (req, res) => {
+    handleSubmissionResultSSE(res);
   });
 
   // Endpoint to submit user code

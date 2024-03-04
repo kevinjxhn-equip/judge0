@@ -26,7 +26,7 @@ const appendSourceCodeBasedOnLanguageAndFunctionName = (
     if (typeof arg === "object") return JSON.stringify(arg);
     return arg.toString();
   };
-  
+
   // Convert single inputTestCase to an array if it's not already an array
   if (!Array.isArray(inputTestCases)) {
     inputTestCases = [inputTestCases];
@@ -60,17 +60,32 @@ export const getResponseAfterExecutingUserCode = async (
   );
 
   try {
-    const submissionResponse = await axios.post(
-      `${baseUrl}/execute_user_code`,
-      {
-        langId,
-        sourceCode: sourceCodeArray[0],
-        expected_output: TEST_CASES.outputTestCases[0],
-        stdin: testInput[0],
-      }
-    );
+    await axios.post(`${baseUrl}/execute_user_code`, {
+      langId,
+      sourceCode: sourceCodeArray[0],
+      expected_output: TEST_CASES.outputTestCases[0],
+      stdin: testInput[0],
+    });
 
-    return submissionResponse.data;
+    // No need to return anything here, as we handle the response in the PUT endpoint
+    return new Promise((resolve, reject) => {
+      const eventSource = new EventSource(`${baseUrl}/judge0_webhook_sse`);
+
+      // Handle SSE messages
+      eventSource.onmessage = (event) => {
+        const submissionResultData = JSON.parse(event.data);
+
+        eventSource.close();
+        resolve(submissionResultData);
+      };
+
+      // Handle SSE errors
+      eventSource.onerror = (error) => {
+        console.error("Error with SSE:", error);
+        eventSource.close();
+        reject(error);
+      };
+    });
   } catch (error) {
     console.log(error);
     throw new Error("Error while executing user's code.");
