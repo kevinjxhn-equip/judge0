@@ -13,7 +13,6 @@ const CustomTestCaseSection = ({
         <Box flex={1}>
           <Textarea
             placeholder="Add a custom test case here..."
-            placeholderTextColor="gray.800"
             minH={{ base: "10rem", xl: "13rem" }}
             variant="filled"
             bg="gray.100" // Set the background color to gray.100
