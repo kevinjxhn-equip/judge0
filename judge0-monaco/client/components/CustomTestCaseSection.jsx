@@ -13,17 +13,28 @@ const CustomTestCaseSection = ({
         <Box flex={1}>
           <Textarea
             placeholder="Add a custom test case here..."
-            minH={"10rem"}
-            variant={"filled"}
+            placeholderTextColor="gray.800"
+            minH={{ base: "10rem", xl: "13rem" }}
+            variant="filled"
+            bg="gray.100" // Set the background color to gray.100
+            color="gray.700" // Set the text color to a darker shade of gray
+            _hover={{ bg: "gray.200" }} // Adjust background color on hover
+            _focus={{
+              bg: "gray.200",
+              borderColor: "blue.400",
+              outline: "none",
+            }} // Adjust background color and border color on focus
             value={customInput}
             onChange={(e) => setCustomInput(e.target.value)}
-            colorScheme="pink"
+            sx={{
+              "&::placeholder": { color: "gray.800", fontWeight: "600" }, // Change placeholder color using CSS
+            }}
           />
         </Box>
         <Box
           flex={1}
           bg={"#1e283b"}
-          minH={"10rem"}
+          minH={{ base: "10rem", xl: "13rem" }}
           p={2}
           border={"1px solid"}
           borderRadius={4}

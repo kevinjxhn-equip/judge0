@@ -209,19 +209,6 @@ const Output = () => {
 
   return (
     <Box mb={2}>
-      {/* <Button
-            variant={"solid"}
-            m={2}
-            colorScheme="green"
-            onClick={runUserCodeAndUpdateOutput}
-            isLoading={loadingState.isRunCodeLoading}
-          >
-            <Flex align={"center"} gap={2}>
-              <CodeBracketIcon fontSize={"x-large"} />
-              Run Your Code
-            </Flex>
-          </Button> */}
-
       <Flex justifyContent={"space-between"} px={2}>
         <ButtonGroup spacing={0}>
           <Button
@@ -251,7 +238,21 @@ const Output = () => {
           </Button>
         </ButtonGroup>
 
+        {/* This needs to change */}
         <ButtonGroup>
+          {!isCustomTestCaseSectionVisible && (
+            <Button
+              variant={"solid"}
+              colorScheme="yellow"
+              onClick={runUserCodeAndUpdateOutput}
+              isLoading={loadingState.isRunCodeLoading}
+            >
+              <Flex align={"center"} gap={2}>
+                Run Your Code
+              </Flex>
+            </Button>
+          )}
+
           {isCustomTestCaseSectionVisible ? (
             <Button
               colorScheme="purple"
@@ -280,7 +281,6 @@ const Output = () => {
       </Flex>
 
       <Box mt={3}>
-        {/* This needs to change */}
         {isCustomTestCaseSectionVisible ? (
           <Flex w={"100%"} gap={6} justify={"flex-start"}>
             <CustomTestCaseSection
@@ -294,7 +294,7 @@ const Output = () => {
           <Box
             w={"100%"}
             bg={"#1e283b"}
-            minH={"10rem"}
+            minH={{ base: "10rem", xl: "13rem" }}
             p={2}
             mt={1}
             borderRadius={4}
