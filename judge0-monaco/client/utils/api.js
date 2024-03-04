@@ -69,12 +69,11 @@ export const getResponseAfterExecutingUserCode = async (
 
     // No need to return anything here, as we handle the response in the PUT endpoint
     return new Promise((resolve, reject) => {
-      const eventSource = new EventSource(`${baseUrl}/judge0_webhook_sse`);
+      const eventSource = new EventSource(`${baseUrl}/judge0_webhook_sse_user_code_execution`);
 
       // Handle SSE messages
       eventSource.onmessage = (event) => {
         const submissionResultData = JSON.parse(event.data);
-
         eventSource.close();
         resolve(submissionResultData);
       };

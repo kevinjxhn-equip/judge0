@@ -19,7 +19,7 @@ const judge0Api = axios.create({
 
 let submissionResultData = null;
 
-// We get the data from Judge0 in base64 encoded format when we use the webhook, so we need to decode it
+// Function to decode base64 data from Judge0
 const decodeBase64 = (data) => {
   const decodedData = {};
   for (const key in data) {
@@ -37,6 +37,28 @@ const decodeBase64 = (data) => {
   return decodedData;
 };
 
+// Function to handle Server Sent Events (SSE)
+const handleSubmissionResultSSE = (res) => {
+  // Setting headers for Server Sent Events
+  res.setHeader("Content-Type", "text/event-stream");
+  res.setHeader("Cache-Control", "no-cache");
+  res.setHeader("Connection", "keep-alive");
+
+  // Example logic to emit SSE events periodically
+  const intervalId = setInterval(() => {
+    if (submissionResultData) {
+      res.write(`data: ${JSON.stringify(submissionResultData)}\n\n`);
+      submissionResultData = null;
+    }
+  }, 5000); // Emit SSE events every 5 seconds
+
+  // Handle client disconnect
+  res.on("close", () => {
+    clearInterval(intervalId); // Stop emitting SSE events when client disconnects
+    console.log("Client disconnected");
+  });
+};
+
 // Main function to run the app
 async function initializeApp() {
   // Endpoint to execute user code
@@ -46,22 +68,24 @@ async function initializeApp() {
     const data = {
       language_id: langId,
       source_code: sourceCode,
-      callback_url: `http://host.docker.internal:${port}/judge0_webhook`,
-      // stdin,
-      // expected_output,
+      callback_url: `http://host.docker.internal:${port}/judge0_webhook_sse_user_code_execution`,
+      stdin,
+      expected_output,
     };
 
     try {
       await judge0Api.post("/submissions", data);
 
-      res.status(200).json({ message: "Code execution started successfully." });
+      res
+        .status(200)
+        .json({ message: "User code execution started successfully." });
     } catch (error) {
       res.status(500).json({ error: error.message });
     }
   });
 
-  // Endpoint to handle webhook notifications from Judge0
-  app.put("/judge0_webhook", (req, res) => {
+  // Endpoint to handle webhook notifications from Judge0 for user code execution
+  app.put("/judge0_webhook_sse_user_code_execution", (req, res) => {
     submissionResultData = decodeBase64(req.body);
 
     console.log("submissionResultData", submissionResultData);
@@ -69,28 +93,8 @@ async function initializeApp() {
     res.status(200).json({ message: "Webhook recieved successfully." });
   });
 
-  const handleSubmissionResultSSE = (res) => {
-    // Setting headers for Server Sent Events
-    res.setHeader("Content-Type", "text/event-stream");
-    res.setHeader("Cache-Control", "no-cache");
-    res.setHeader("Connection", "keep-alive");
-
-    // Example logic to emit SSE events periodically
-    const intervalId = setInterval(() => {
-      if (submissionResultData) {
-        res.write(`data: ${JSON.stringify(submissionResultData)}\n\n`);
-        submissionResultData = null;
-      }
-    }, 5000); // Emit SSE events every 5 seconds
-
-    // Handle client disconnect
-    res.on("close", () => {
-      clearInterval(intervalId); // Stop emitting SSE events when client disconnects
-      console.log("Client disconnected");
-    });
-  };
   // Endpoint to stream submission result data via SSE
-  app.get("/judge0_webhook_sse", (req, res) => {
+  app.get("/judge0_webhook_sse_user_code_execution", (req, res) => {
     handleSubmissionResultSSE(res);
   });
 
