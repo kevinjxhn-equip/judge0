@@ -18,6 +18,7 @@ const judge0Api = axios.create({
 });
 
 let submissionResultData = null;
+let batchSubmissionResultDataList = [];
 
 // Function to decode base64 data from Judge0
 const decodeBase64 = (data) => {
@@ -39,7 +40,6 @@ const decodeBase64 = (data) => {
 
 // Main function to run the app
 async function initializeApp() {
-  // Endpoint to execute user code
   app.post("/execute_user_code", async (req, res) => {
     const { langId, sourceCode, expected_output, stdin } = req.body;
 
@@ -62,7 +62,6 @@ async function initializeApp() {
     }
   });
 
-  // Endpoint to handle webhook notifications from Judge0 for user code execution
   app.put("/judge0_webhook_user_code_execution", (req, res) => {
     submissionResultData = decodeBase64(req.body);
 
@@ -71,40 +70,49 @@ async function initializeApp() {
     res.status(200).json({ message: "Webhook recieved successfully." });
   });
 
-  // Endpoint to stream submission result data via SSE
   app.get("/judge0_webhook_user_code_execution", (req, res) => {
     if (submissionResultData) {
-      res.status(200).json(submissionResultData); 
-      submissionResultData = null; // Clear submission result data after sending
+      res.status(200).json(submissionResultData);
+      submissionResultData = null;
     } else {
-      res.status(404).send("No submission result data available."); 
+      res.status(404).send("No submission result data available.");
     }
   });
 
-  // Endpoint to submit user code
   app.post("/submit_user_code", async (req, res) => {
+    const updatedRequestBody = {
+      submissions: req.body.submissions.map((submission) => ({
+        ...submission,
+        callback_url: `http://host.docker.internal:${port}/judge0_webhook_submit_user_code`,
+      })),
+    };
+
     try {
-      const response = await judge0Api.post("/submissions/batch", req.body);
-      const tokens = response.data.map((item) => item.token).join(",");
+      await judge0Api.post("/submissions/batch", updatedRequestBody);
 
-      let submissionResponse;
-      do {
-        submissionResponse = await judge0Api.get(
-          `/submissions/batch?tokens=${tokens}`
-        );
-
-        if (submissionResponse.data.submissions[0].status.id <= 2) {
-          await new Promise((resolve) => setTimeout(resolve, 2000));
-        }
-
-        console.log(submissionResponse.data.submissions[0].status);
-      } while (
-        submissionResponse.data.submissions.every((item) => item.status.id <= 2)
-      );
-
-      res.json(submissionResponse.data);
+      res
+        .status(200)
+        .json({ message: "User code execution started successfully." });
     } catch (error) {
       res.status(500).json({ error: error.message });
+    }
+  });
+
+  app.put("/judge0_webhook_submit_user_code", (req, res) => {
+    const decodedSubmissionResultData = decodeBase64(req.body);
+    batchSubmissionResultDataList.push(decodedSubmissionResultData); // Push received object into the array
+
+    console.log("Received object:", decodedSubmissionResultData);
+
+    res.status(200).json({ message: "Webhook recieved successfully." });
+  });
+
+  app.get("/judge0_webhook_submit_user_code", (req, res) => {
+    if (batchSubmissionResultDataList.length > 0) {
+      res.status(200).json(batchSubmissionResultDataList);
+      batchSubmissionResultDataList = [];
+    } else {
+      res.status(404).send("No submission result data available.");
     }
   });
 

@@ -46,11 +46,11 @@ const appendSourceCodeBasedOnLanguageAndFunctionName = (
 };
 
 // Polling function to repeatedly check for response
-const pollForResult = () => {
+const pollForResult = (serverUrl) => {
   return new Promise((resolve, reject) => {
     const pollInterval = setInterval(async () => {
       try {
-        const response = await axios.get(`${baseUrl}/judge0_webhook_user_code_execution`);
+        const response = await axios.get(`${baseUrl}/${serverUrl}`);
         if (response.status === 200) {
           clearInterval(pollInterval); // Stop polling
           resolve(response.data); // Resolve with submission result data
@@ -88,7 +88,7 @@ export const getResponseAfterExecutingUserCode = async (
       stdin: testInput[0],
     });
 
-    return await pollForResult();
+    return await pollForResult('judge0_webhook_user_code_execution');
 
   } catch (error) {
     console.log(error);
@@ -116,11 +116,11 @@ export const getResponseAfterSubmittingUserCode = async (
   }));
 
   try {
-    const submissionResponse = await axios.post(`${baseUrl}/submit_user_code`, {
+    await axios.post(`${baseUrl}/submit_user_code`, {
       submissions: submissions,
     });
 
-    return submissionResponse.data;
+    return await pollForResult('judge0_webhook_submit_user_code');
   } catch (error) {
     console.log(error);
     throw new Error("Error while submitting user's code.");

@@ -179,7 +179,7 @@ const Output = () => {
         sourceCode
       );
       console.log(result);
-      const isPassed = result.submissions.every((item) => item.status.id === 3);
+      const isPassed = result.every((item) => item.status.id === 3);
 
       if (isPassed) {
         toast({
