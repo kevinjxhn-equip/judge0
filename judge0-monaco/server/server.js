@@ -37,28 +37,6 @@ const decodeBase64 = (data) => {
   return decodedData;
 };
 
-// Function to handle Server Sent Events (SSE)
-const handleSubmissionResultSSE = (res) => {
-  // Setting headers for Server Sent Events
-  res.setHeader("Content-Type", "text/event-stream");
-  res.setHeader("Cache-Control", "no-cache");
-  res.setHeader("Connection", "keep-alive");
-
-  // Example logic to emit SSE events periodically
-  const intervalId = setInterval(() => {
-    if (submissionResultData) {
-      res.write(`data: ${JSON.stringify(submissionResultData)}\n\n`);
-      submissionResultData = null;
-    }
-  }, 5000); // Emit SSE events every 5 seconds
-
-  // Handle client disconnect
-  res.on("close", () => {
-    clearInterval(intervalId); // Stop emitting SSE events when client disconnects
-    console.log("Client disconnected");
-  });
-};
-
 // Main function to run the app
 async function initializeApp() {
   // Endpoint to execute user code
@@ -68,7 +46,7 @@ async function initializeApp() {
     const data = {
       language_id: langId,
       source_code: sourceCode,
-      callback_url: `http://host.docker.internal:${port}/judge0_webhook_sse_user_code_execution`,
+      callback_url: `http://host.docker.internal:${port}/judge0_webhook_user_code_execution`,
       stdin,
       expected_output,
     };
@@ -85,7 +63,7 @@ async function initializeApp() {
   });
 
   // Endpoint to handle webhook notifications from Judge0 for user code execution
-  app.put("/judge0_webhook_sse_user_code_execution", (req, res) => {
+  app.put("/judge0_webhook_user_code_execution", (req, res) => {
     submissionResultData = decodeBase64(req.body);
 
     console.log("submissionResultData", submissionResultData);
@@ -94,8 +72,13 @@ async function initializeApp() {
   });
 
   // Endpoint to stream submission result data via SSE
-  app.get("/judge0_webhook_sse_user_code_execution", (req, res) => {
-    handleSubmissionResultSSE(res);
+  app.get("/judge0_webhook_user_code_execution", (req, res) => {
+    if (submissionResultData) {
+      res.status(200).json(submissionResultData); 
+      submissionResultData = null; // Clear submission result data after sending
+    } else {
+      res.status(404).send("No submission result data available."); 
+    }
   });
 
   // Endpoint to submit user code

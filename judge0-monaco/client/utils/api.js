@@ -45,6 +45,27 @@ const appendSourceCodeBasedOnLanguageAndFunctionName = (
   return sourceCodeArray;
 };
 
+// Polling function to repeatedly check for response
+const pollForResult = () => {
+  return new Promise((resolve, reject) => {
+    const pollInterval = setInterval(async () => {
+      try {
+        const response = await axios.get(`${baseUrl}/judge0_webhook_user_code_execution`);
+        if (response.status === 200) {
+          clearInterval(pollInterval); // Stop polling
+          resolve(response.data); // Resolve with submission result data
+        } else {
+          console.log("Polling: Response status not 200");
+        }
+      } catch (error) {
+        console.error("Polling: Error occurred", error);
+        clearInterval(pollInterval); // Stop polling on error
+        reject(error);
+      }
+    }, 3000); // Poll every 3 seconds
+  });
+};
+
 export const getResponseAfterExecutingUserCode = async (
   language,
   sourceCode
@@ -67,24 +88,8 @@ export const getResponseAfterExecutingUserCode = async (
       stdin: testInput[0],
     });
 
-    // No need to return anything here, as we handle the response in the PUT endpoint
-    return new Promise((resolve, reject) => {
-      const eventSource = new EventSource(`${baseUrl}/judge0_webhook_sse_user_code_execution`);
+    return await pollForResult();
 
-      // Handle SSE messages
-      eventSource.onmessage = (event) => {
-        const submissionResultData = JSON.parse(event.data);
-        eventSource.close();
-        resolve(submissionResultData);
-      };
-
-      // Handle SSE errors
-      eventSource.onerror = (error) => {
-        console.error("Error with SSE:", error);
-        eventSource.close();
-        reject(error);
-      };
-    });
   } catch (error) {
     console.log(error);
     throw new Error("Error while executing user's code.");
