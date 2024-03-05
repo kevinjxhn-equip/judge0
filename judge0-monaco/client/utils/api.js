@@ -88,8 +88,7 @@ export const getResponseAfterExecutingUserCode = async (
       stdin: testInput[0],
     });
 
-    return await pollForResult('judge0_webhook_user_code_execution');
-
+    return await pollForResult("judge0_webhook_user_code_execution");
   } catch (error) {
     console.log(error);
     throw new Error("Error while executing user's code.");
@@ -120,7 +119,7 @@ export const getResponseAfterSubmittingUserCode = async (
       submissions: submissions,
     });
 
-    return await pollForResult('judge0_webhook_submit_user_code');
+    return await pollForResult("judge0_webhook_submit_user_code");
   } catch (error) {
     console.log(error);
     throw new Error("Error while submitting user's code.");
@@ -154,16 +153,13 @@ export const getResponseAfterExecutingUserCustomInputCode = async (
   );
 
   try {
-    const submissionResponse = await axios.post(
-      `${baseUrl}/execute_user_code`,
-      {
-        langId,
-        sourceCode: sourceCodeArray[0],
-        stdin: customInput,
-      }
-    );
+    await axios.post(`${baseUrl}/execute_user_code`, {
+      langId,
+      sourceCode: sourceCodeArray[0],
+      stdin: customInput,
+    });
 
-    return submissionResponse.data;
+    return await pollForResult("judge0_webhook_user_code_execution");
   } catch (error) {
     console.log(error);
     throw new Error("Error while executing user's custom input code.");

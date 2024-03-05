@@ -54,41 +54,41 @@ const Output = () => {
       );
 
       console.log(result);
-      // const statusId = result.status.id;
+      const statusId = result.status.id;
 
-      // // Correct Answer
-      // if (statusId === 3) {
-      //   setIsError(false);
-      //   setOutput(result.stdout.split("\n"));
+      // Correct Answer
+      if (statusId === 3) {
+        setIsError(false);
+        setOutput(result.stdout.split("\n"));
 
-      //   // Wrong Answer
-      // } else if (statusId === 4) {
-      //   setIsError(false);
+        // Wrong Answer
+      } else if (statusId === 4) {
+        setIsError(false);
 
-      //   if (
-      //     result.stderr === null &&
-      //     (!result.stdout || result.stdout.trim() === "")
-      //   ) {
-      //     setOutput(["No output from the code"]);
-      //   } else {
-      //     setOutput(result.stdout.split("\n"));
-      //   }
+        if (
+          result.stderr === null &&
+          (!result.stdout || result.stdout.trim() === "")
+        ) {
+          setOutput(["No output from the code"]);
+        } else {
+          setOutput(result.stdout.split("\n"));
+        }
 
-      //   // Compilation Error
-      // } else if (statusId === 6) {
-      //   setIsError(true);
-      //   setOutput(result.compile_output.split("\n"));
+        // Compilation Error
+      } else if (statusId === 6) {
+        setIsError(true);
+        setOutput(result.compile_output.split("\n"));
 
-      //   // Time Limit Exceeded
-      // } else if (statusId === 5) {
-      //   setIsError(true);
-      //   setOutput(["Time Limit Exceeded"]);
+        // Time Limit Exceeded
+      } else if (statusId === 5) {
+        setIsError(true);
+        setOutput(["Time Limit Exceeded"]);
 
-      //   // Runtime Error and Internal Error
-      // } else {
-      //   setIsError(true);
-      //   setOutput(result.stderr.split("\n"));
-      // }
+        // Runtime Error and Internal Error
+      } else {
+        setIsError(true);
+        setOutput(result.stderr.split("\n"));
+      }
     } catch (error) {
       console.log(error);
     } finally {
@@ -275,22 +275,20 @@ const Output = () => {
             </Button>
           )}
 
-          <Button variant={"solid"} colorScheme="whatsapp">
+          {/* <Button variant={"solid"} colorScheme="whatsapp">
             Submit
-          </Button>
+          </Button> */}
         </ButtonGroup>
       </Flex>
 
       <Box mt={3}>
         {isCustomTestCaseSectionVisible ? (
-          <Flex w={"100%"} gap={6} justify={"flex-start"}>
-            <CustomTestCaseSection
-              customTestCaseOutput={customTestCaseOutput}
-              isCustomError={isCustomError}
-              customInput={customInput}
-              setCustomInput={setCustomInput}
-            />
-          </Flex>
+          <CustomTestCaseSection
+            customTestCaseOutput={customTestCaseOutput}
+            isCustomError={isCustomError}
+            customInput={customInput}
+            setCustomInput={setCustomInput}
+          />
         ) : (
           <Box
             w={"100%"}
