@@ -16,7 +16,7 @@ const languages = Object.entries(LANGUAGE_VERSIONS);
 
 const LanguageSelector = ({ activeLanguage, onSelect }) => {
   return (
-    <Box ml={2} mb={2}>
+    <Box ml={2}>
       <Menu isLazy>
         <MenuButton
           mb={2}

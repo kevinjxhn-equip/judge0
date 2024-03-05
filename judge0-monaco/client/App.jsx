@@ -1,11 +1,11 @@
-import { Box } from "@chakra-ui/react";
+import { Flex } from "@chakra-ui/react";
 import ProgrammingTestTemplate from "./components/ProgrammingTestTemplate";
 
 function App() {
   return (
-    <Box minH={"100vh"} bg={"white"} p={4} color={"gray.800"} px={6} py={10}>
+    <Flex minH={"100vh"} bg={"white"} color={"gray.800"} align={"center"}>
       <ProgrammingTestTemplate />
-    </Box>
+    </Flex>
   );
 }
 

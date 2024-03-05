@@ -3,6 +3,8 @@ import {
   Button,
   ButtonGroup,
   Flex,
+  Grid,
+  GridItem,
   Text,
   useToast,
   VStack,
@@ -56,39 +58,39 @@ const Output = () => {
       console.log(result);
       const statusId = result.status.id;
 
-      // Correct Answer
-      if (statusId === 3) {
-        setIsError(false);
-        setOutput(result.stdout.split("\n"));
+      // // Correct Answer
+      // if (statusId === 3) {
+      //   setIsError(false);
+      //   setOutput(result.stdout.split("\n"));
 
-        // Wrong Answer
-      } else if (statusId === 4) {
-        setIsError(false);
+      //   // Wrong Answer
+      // } else if (statusId === 4) {
+      //   setIsError(false);
 
-        if (
-          result.stderr === null &&
-          (!result.stdout || result.stdout.trim() === "")
-        ) {
-          setOutput(["No output from the code"]);
-        } else {
-          setOutput(result.stdout.split("\n"));
-        }
+      //   if (
+      //     result.stderr === null &&
+      //     (!result.stdout || result.stdout.trim() === "")
+      //   ) {
+      //     setOutput(["No output from the code"]);
+      //   } else {
+      //     setOutput(result.stdout.split("\n"));
+      //   }
 
-        // Compilation Error
-      } else if (statusId === 6) {
-        setIsError(true);
-        setOutput(result.compile_output.split("\n"));
+      //   // Compilation Error
+      // } else if (statusId === 6) {
+      //   setIsError(true);
+      //   setOutput(result.compile_output.split("\n"));
 
-        // Time Limit Exceeded
-      } else if (statusId === 5) {
-        setIsError(true);
-        setOutput(["Time Limit Exceeded"]);
+      //   // Time Limit Exceeded
+      // } else if (statusId === 5) {
+      //   setIsError(true);
+      //   setOutput(["Time Limit Exceeded"]);
 
-        // Runtime Error and Internal Error
-      } else {
-        setIsError(true);
-        setOutput(result.stderr.split("\n"));
-      }
+      //   // Runtime Error and Internal Error
+      // } else {
+      //   setIsError(true);
+      //   setOutput(result.stderr.split("\n"));
+      // }
     } catch (error) {
       console.log(error);
     } finally {
@@ -239,9 +241,8 @@ const Output = () => {
           </Button>
         </ButtonGroup>
 
-        {/* This needs to change */}
         <ButtonGroup>
-          {!isCustomTestCaseSectionVisible && (
+          {/* {!isCustomTestCaseSectionVisible && (
             <Button
               variant={"solid"}
               colorScheme="yellow"
@@ -252,7 +253,7 @@ const Output = () => {
                 Run Your Code
               </Flex>
             </Button>
-          )}
+          )} */}
 
           {isCustomTestCaseSectionVisible ? (
             <Button
@@ -290,22 +291,70 @@ const Output = () => {
             setCustomInput={setCustomInput}
           />
         ) : (
-          <Box
-            w={"100%"}
-            bg={"#1e283b"}
-            minH={{ base: "10rem", xl: "13rem" }}
-            p={2}
-            mt={1}
-            borderRadius={4}
-            color={isError ? "red.400" : "#309F57"}
-            borderColor={isError ? "red.500" : "#333"}
-            overflowY={"scroll"}
-            fontWeight={600}
-          >
-            {output
-              ? output.map((line, i) => <Text key={i}>{line}</Text>)
-              : 'Click "Run Your Code" to see the output here'}
-          </Box>
+          // <Box
+          //   w={"100%"}
+          //   bg={"#1e283b"}
+          //   minH={{ base: "10rem", xl: "13rem" }}
+          //   p={2}
+          //   mt={1}
+          //   borderRadius={4}
+          //   color={isError ? "red.400" : "#309F57"}
+          //   borderColor={isError ? "red.500" : "#333"}
+          //   overflowY={"scroll"}
+          //   fontWeight={600}
+          // >
+          //   {output
+          //     ? output.map((line, i) => <Text key={i}>{line}</Text>)
+          //     : 'Click "Run Your Code" to see the output here'}
+          // </Box>
+          <Flex direction="column" h={"13rem"} px={2} overflow={"scroll"}>
+            <Flex
+              justify="space-between"
+              align="center"
+              flex={1}
+              color={"gray.500"}
+            >
+              <Box flex={1} textAlign="center">
+                <Box p={2}>
+                  <Text fontWeight={500}>Input</Text>
+                </Box>
+              </Box>
+              <Box flex={1} textAlign="center">
+                <Box p={2}>
+                  <Text fontWeight={500}>Expected Output</Text>
+                </Box>
+              </Box>
+            </Flex>
+            <Flex
+              justify="space-between"
+              align="center"
+              flex={1}
+              bg={"#f3f4f6"}
+            >
+              <Box flex={1} textAlign="center">
+                <Box p={2}>
+                  <Text fontWeight={700}>aaa</Text>
+                </Box>
+              </Box>
+              <Box flex={1} textAlign="center">
+                <Box p={2}>
+                  <Text fontWeight={700}>a</Text>
+                </Box>
+              </Box>
+            </Flex>
+            <Flex justify="space-between" align="center" flex={1}>
+              <Box flex={1} textAlign="center">
+                <Box p={2}>
+                  <Text fontWeight={700}>bc</Text>
+                </Box>
+              </Box>
+              <Box flex={1} textAlign="center">
+                <Box p={2}>
+                  <Text fontWeight={700}>b</Text>
+                </Box>
+              </Box>
+            </Flex>
+          </Flex>
         )}
       </Box>
     </Box>

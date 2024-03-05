@@ -43,7 +43,7 @@ const ProgrammingTestTemplate = () => {
 
         <Flex w={"70%"} gap={4} direction={"column"}>
           <Box>
-            <Flex gap={2} p={1} mt={1}>
+            <Flex gap={2} mt={3}>
               <LanguageSelector
                 activeLanguage={activeLanguage}
                 onSelect={onSelect}

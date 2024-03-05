@@ -133,15 +133,12 @@ export const getResponseAfterExecutingUserCustomInputCode = async (
 ) => {
   const langId = JUDGE0_LANGS_ID[language];
 
-  console.log(typeof customInput, customInput);
-
   // We need it in the form of an array
   let formattedCustomInput = [customInput];
 
   try {
     formattedCustomInput = JSON.parse(customInput);
   } catch (error) {
-    console.error("Error parsing custom input, caught", error);
     return { error: "Invalid custom input format" };
   }
 
