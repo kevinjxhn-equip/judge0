@@ -307,6 +307,7 @@ const Output = () => {
           //     ? output.map((line, i) => <Text key={i}>{line}</Text>)
           //     : 'Click "Run Your Code" to see the output here'}
           // </Box>
+
           <Flex direction="column" h={"13rem"} px={2} overflow={"scroll"}>
             <Flex
               justify="space-between"
@@ -322,6 +323,13 @@ const Output = () => {
               <Box flex={1} textAlign="center">
                 <Box p={2}>
                   <Text fontWeight={500}>Expected Output</Text>
+                </Box>
+              </Box>
+              
+              {/* This is after we get response */}
+              <Box flex={1} textAlign="center">
+                <Box p={2}>
+                  <Text fontWeight={500}>Output</Text>
                 </Box>
               </Box>
             </Flex>
@@ -341,6 +349,13 @@ const Output = () => {
                   <Text fontWeight={700}>a</Text>
                 </Box>
               </Box>
+
+              {/* This is after we get response */}
+              <Box flex={1} textAlign="center">
+                <Box p={2}>
+                  <Text fontWeight={700}>Check</Text>
+                </Box>
+              </Box>
             </Flex>
             <Flex justify="space-between" align="center" flex={1}>
               <Box flex={1} textAlign="center">
@@ -351,6 +366,13 @@ const Output = () => {
               <Box flex={1} textAlign="center">
                 <Box p={2}>
                   <Text fontWeight={700}>b</Text>
+                </Box>
+              </Box>
+
+              {/* This is after we get response */}
+              <Box flex={1} textAlign="center">
+                <Box p={2}>
+                  <Text fontWeight={700}>check</Text>
                 </Box>
               </Box>
             </Flex>
