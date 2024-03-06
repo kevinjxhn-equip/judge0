@@ -91,6 +91,7 @@ async function initializeApp() {
       submissionResultData = null;
     } else {
       res.status(404).send("No submission result data available.");
+      submissionResultData = null;
     }
   });
 
@@ -138,6 +139,7 @@ async function initializeApp() {
       batchSubmissionResultDataList = [];
     } else {
       res.status(404).send("No submission result data available.");
+      batchSubmissionResultDataList = [];
     }
   });
 

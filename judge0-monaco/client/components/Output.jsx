@@ -193,6 +193,7 @@ const Output = () => {
           };
         } else {
           let errorMessage;
+          let color;
           switch (statusId) {
             case 4:
               errorMessage =
@@ -200,20 +201,24 @@ const Output = () => {
                 (!item.stdout || item.stdout.trim() === "")
                   ? ["No output from the code"]
                   : item.stdout.split("\n");
+              color = "orange.500";
               break;
             case 6:
               errorMessage = item.compile_output.split("\n");
+              color = "red.500";
               break;
             case 5:
               errorMessage = ["Time Limit Exceeded"];
+              color = "red.500";
               break;
             default:
               errorMessage = item.stderr.split("\n");
+              color = "red.500";
           }
 
           output = {
             text: errorMessage,
-            color: "red.500",
+            color: color,
           };
         }
 
@@ -393,7 +398,7 @@ const Output = () => {
                     flex={1}
                     direction={"column"}
                     justify={
-                      item.color === "green.500" ? "center" : "flex-start"
+                      item.color === "green.500" || item.color === "orange.500" ? "center" : "flex-start"
                     }
                     overflow={"auto"}
                     w="100%"
