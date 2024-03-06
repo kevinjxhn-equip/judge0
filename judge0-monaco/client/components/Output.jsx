@@ -19,14 +19,15 @@ import { editorRefProvider, languageProvider } from "./ProgrammingTestTemplate";
 import { getResponseAfterExecutingUserCustomInputCode } from "../utils/api";
 
 const Output = () => {
-  const [isError, setIsError] = React.useState(false);
-  const [output, setOutput] = React.useState(null);
+  // const [isError, setIsError] = React.useState(false);
+  // const [output, setOutput] = React.useState(null);
   const [isCustomTestCaseSectionVisible, setIsCustomTestCaseSectionVisible] =
     React.useState(false);
 
   const [customInput, setCustomInput] = React.useState("");
   const [isCustomError, setIsCustomError] = React.useState(false);
   const [customTestCaseOutput, setCustomTestCaseOutput] = React.useState(null);
+  const [batchOutput, setBatchOutput] = React.useState(null);
 
   const [loadingState, setLoadingState] = React.useState({
     isSubmitLoading: false,
@@ -37,69 +38,67 @@ const Output = () => {
   const editorRef = React.useContext(editorRefProvider);
   const activeLanguage = React.useContext(languageProvider);
 
-  const toast = useToast();
+  // const runUserCodeAndUpdateOutput = async () => {
+  //   const sourceCode = editorRef.current.getValue();
 
-  const runUserCodeAndUpdateOutput = async () => {
-    const sourceCode = editorRef.current.getValue();
+  //   if (!sourceCode) return;
 
-    if (!sourceCode) return;
+  //   try {
+  //     setLoadingState((prevState) => ({
+  //       ...prevState,
+  //       isRunCodeLoading: true,
+  //     }));
 
-    try {
-      setLoadingState((prevState) => ({
-        ...prevState,
-        isRunCodeLoading: true,
-      }));
+  //     const result = await getResponseAfterExecutingUserCode(
+  //       activeLanguage,
+  //       sourceCode
+  //     );
 
-      const result = await getResponseAfterExecutingUserCode(
-        activeLanguage,
-        sourceCode
-      );
+  //     console.log(result);
+  //     const statusId = result.status.id;
 
-      console.log(result);
-      const statusId = result.status.id;
+  // // Correct Answer
+  // if (statusId === 3) {
+  //   setIsError(false);
+  //   setOutput(result.stdout.split("\n"));
 
-      // // Correct Answer
-      // if (statusId === 3) {
-      //   setIsError(false);
-      //   setOutput(result.stdout.split("\n"));
+  //   // Wrong Answer
+  // } else if (statusId === 4) {
+  //   setIsError(false);
 
-      //   // Wrong Answer
-      // } else if (statusId === 4) {
-      //   setIsError(false);
+  //   if (
+  //     result.stderr === null &&
+  //     (!result.stdout || result.stdout.trim() === "")
+  //   ) {
+  //     setOutput(["No output from the code"]);
+  //   } else {
+  //     setOutput(result.stdout.split("\n"));
+  //   }
 
-      //   if (
-      //     result.stderr === null &&
-      //     (!result.stdout || result.stdout.trim() === "")
-      //   ) {
-      //     setOutput(["No output from the code"]);
-      //   } else {
-      //     setOutput(result.stdout.split("\n"));
-      //   }
+  //   // Compilation Error
+  // } else if (statusId === 6) {
+  //   setIsError(true);
+  //   setOutput(result.compile_output.split("\n"));
 
-      //   // Compilation Error
-      // } else if (statusId === 6) {
-      //   setIsError(true);
-      //   setOutput(result.compile_output.split("\n"));
+  //   // Time Limit Exceeded
+  // } else if (statusId === 5) {
+  //   setIsError(true);
+  //   setOutput(["Time Limit Exceeded"]);
 
-      //   // Time Limit Exceeded
-      // } else if (statusId === 5) {
-      //   setIsError(true);
-      //   setOutput(["Time Limit Exceeded"]);
-
-      //   // Runtime Error and Internal Error
-      // } else {
-      //   setIsError(true);
-      //   setOutput(result.stderr.split("\n"));
-      // }
-    } catch (error) {
-      console.log(error);
-    } finally {
-      setLoadingState((prevState) => ({
-        ...prevState,
-        isRunCodeLoading: false,
-      }));
-    }
-  };
+  //   // Runtime Error and Internal Error
+  // } else {
+  //   setIsError(true);
+  //   setOutput(result.stderr.split("\n"));
+  // }
+  //   } catch (error) {
+  //     console.log(error);
+  //   } finally {
+  //     setLoadingState((prevState) => ({
+  //       ...prevState,
+  //       isRunCodeLoading: false,
+  //     }));
+  //   }
+  // };
 
   const runCustomTestCase = async () => {
     const sourceCode = editorRef.current.getValue();
@@ -180,26 +179,48 @@ const Output = () => {
         activeLanguage,
         sourceCode
       );
-      console.log(result);
-      const isPassed = result.every((item) => item.status.id === 3);
 
-      if (isPassed) {
-        toast({
-          title: "Great job!",
-          description: "All cases passed!",
-          status: "success",
-          duration: 5000,
-          isClosable: true,
-        });
-      } else {
-        toast({
-          title: "One or more test cases failed",
-          description: "Please check your code.",
-          status: "error",
-          duration: 5000,
-          isClosable: true,
-        });
-      }
+      console.log(result);
+
+      const updatedBatchOutput = result.map((item) => {
+        const statusId = item.status.id;
+        let output;
+
+        if (statusId === 3) {
+          output = {
+            text: item.stdout.split("\n"),
+            color: "green.500",
+          };
+        } else {
+          let errorMessage;
+          switch (statusId) {
+            case 4:
+              errorMessage =
+                item.stderr === null &&
+                (!item.stdout || item.stdout.trim() === "")
+                  ? ["No output from the code"]
+                  : item.stdout.split("\n");
+              break;
+            case 6:
+              errorMessage = item.compile_output.split("\n");
+              break;
+            case 5:
+              errorMessage = ["Time Limit Exceeded"];
+              break;
+            default:
+              errorMessage = item.stderr.split("\n");
+          }
+
+          output = {
+            text: errorMessage,
+            color: "red.500",
+          };
+        }
+
+        return output;
+      });
+
+      setBatchOutput(updatedBatchOutput);
     } catch (error) {
       console.log(error);
     } finally {
@@ -307,75 +328,87 @@ const Output = () => {
           //     ? output.map((line, i) => <Text key={i}>{line}</Text>)
           //     : 'Click "Run Your Code" to see the output here'}
           // </Box>
-
-          <Flex direction="column" h={"13rem"} px={2} overflow={"scroll"}>
+          <Flex>
             <Flex
-              justify="space-between"
-              align="center"
-              flex={1}
-              color={"gray.500"}
+              direction="column"
+              h={"13rem"}
+              pl={2}
+              overflow={"scroll"}
+              flex={2}
             >
-              <Box flex={1} textAlign="center">
-                <Box p={2}>
+              <Flex
+                justify="space-between"
+                align="center"
+                flex={1}
+                color={"gray.500"}
+              >
+                <Box flex={1} textAlign="center" p={2}>
                   <Text fontWeight={500}>Input</Text>
                 </Box>
-              </Box>
-              <Box flex={1} textAlign="center">
-                <Box p={2}>
-                  <Text fontWeight={500}>Expected Output</Text>
+                <Box flex={1} textAlign="center">
+                  <Box p={2}>
+                    <Text fontWeight={500}>Expected Output</Text>
+                  </Box>
                 </Box>
-              </Box>
-              
-              {/* This is after we get response */}
-              <Box flex={1} textAlign="center">
-                <Box p={2}>
-                  <Text fontWeight={500}>Output</Text>
-                </Box>
-              </Box>
-            </Flex>
-            <Flex
-              justify="space-between"
-              align="center"
-              flex={1}
-              bg={"#f3f4f6"}
-            >
-              <Box flex={1} textAlign="center">
-                <Box p={2}>
+              </Flex>
+              <Flex
+                justify="space-between"
+                align="center"
+                flex={1}
+                bg={"#f3f4f6"}
+              >
+                <Box flex={1} textAlign="center" p={2}>
                   <Text fontWeight={700}>aaa</Text>
                 </Box>
-              </Box>
-              <Box flex={1} textAlign="center">
-                <Box p={2}>
+                <Box flex={1} textAlign="center" p={2}>
                   <Text fontWeight={700}>a</Text>
                 </Box>
-              </Box>
-
-              {/* This is after we get response */}
-              <Box flex={1} textAlign="center">
-                <Box p={2}>
-                  <Text fontWeight={700}>Check</Text>
-                </Box>
-              </Box>
-            </Flex>
-            <Flex justify="space-between" align="center" flex={1}>
-              <Box flex={1} textAlign="center">
-                <Box p={2}>
+              </Flex>
+              <Flex justify="space-between" align="center" flex={1}>
+                <Box flex={1} textAlign="center" p={2}>
                   <Text fontWeight={700}>bc</Text>
                 </Box>
-              </Box>
-              <Box flex={1} textAlign="center">
-                <Box p={2}>
+                <Box flex={1} textAlign="center" p={2}>
                   <Text fontWeight={700}>b</Text>
                 </Box>
-              </Box>
-
-              {/* This is after we get response */}
-              <Box flex={1} textAlign="center">
-                <Box p={2}>
-                  <Text fontWeight={700}>check</Text>
-                </Box>
-              </Box>
+              </Flex>
             </Flex>
+            {batchOutput && (
+              <Flex flex={1} direction="column" h="13rem" align="center">
+                <Flex
+                  flex={1}
+                  textAlign="center"
+                  align="center"
+                  w="100%"
+                  justify="center"
+                >
+                  <Text fontWeight={500} color="gray.500">
+                    Output
+                  </Text>
+                </Flex>
+
+                {batchOutput.map((item, index) => (
+                  <Flex
+                    key={index}
+                    flex={1}
+                    direction={"column"}
+                    justify={
+                      item.color === "green.500" ? "center" : "flex-start"
+                    }
+                    overflow={"auto"}
+                    w="100%"
+                    color={item.color} // Set color based on status
+                    bg={index % 2 === 0 ? "#f3f4f6" : "white"}
+                  >
+                    {item.text.map((line, index) => (
+                      <Text fontWeight={600} key={index}>
+                        {line}
+                      </Text>
+                    ))}
+                  </Flex>
+                ))}
+              </Flex>
+            )}
           </Flex>
         )}
       </Box>

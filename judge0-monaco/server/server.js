@@ -19,24 +19,39 @@ const judge0Api = axios.create({
 
 let submissionResultData = null;
 let batchSubmissionResultDataList = [];
+let responseTokenData = null;
 
 // Function to decode base64 data from Judge0
 const decodeBase64 = (data) => {
   const decodedData = {};
   for (const key in data) {
-    if (typeof data[key] === "string" && data[key].trim().endsWith("=")) {
+    if (key === "time" || key === "token") {
+      // Skip decoding for keys "time" and "token"
+      decodedData[key] = data[key];
+    } else {
       try {
         decodedData[key] = Buffer.from(data[key], "base64").toString("utf-8");
       } catch (error) {
         // If decoding fails, keep the original value
         decodedData[key] = data[key];
       }
-    } else {
-      decodedData[key] = data[key];
     }
   }
+
   return decodedData;
 };
+
+function sortByToken(tokenData, dataToSort) {
+  return dataToSort.sort((a, b) => {
+    const tokenA = tokenData.findIndex(
+      (tokenObj) => tokenObj.token === a.token
+    );
+    const tokenB = tokenData.findIndex(
+      (tokenObj) => tokenObj.token === b.token
+    );
+    return tokenA - tokenB;
+  });
+}
 
 // Main function to run the app
 async function initializeApp() {
@@ -88,7 +103,12 @@ async function initializeApp() {
     };
 
     try {
-      await judge0Api.post("/submissions/batch", updatedRequestBody);
+      const response = await judge0Api.post(
+        "/submissions/batch",
+        updatedRequestBody
+      );
+
+      responseTokenData = response.data;
 
       res
         .status(200)
@@ -109,7 +129,12 @@ async function initializeApp() {
 
   app.get("/judge0_webhook_submit_user_code", (req, res) => {
     if (batchSubmissionResultDataList.length > 0) {
-      res.status(200).json(batchSubmissionResultDataList);
+      const sortedData = sortByToken(
+        responseTokenData,
+        batchSubmissionResultDataList
+      );
+
+      res.status(200).json(sortedData);
       batchSubmissionResultDataList = [];
     } else {
       res.status(404).send("No submission result data available.");
