@@ -21,10 +21,10 @@ const judge0Api = axios.create({
 });
 
 
-let responseTokenData = null;
 
 const userCustomSubmissionResultMap = new Map();
 const batchSubmissionResultDataMap = new Map();
+const userTokenDataMap = new Map();
 
 // Function to decode base64 data from Judge0
 const decodeBase64 = (data) => {
@@ -188,7 +188,8 @@ async function initializeApp() {
         submissions,
       });
 
-      responseTokenData = response.data;
+      const responseTokenData = response.data;
+      userTokenDataMap.set(userName, responseTokenData);
 
       res
         .status(200)
@@ -216,22 +217,28 @@ async function initializeApp() {
   });
 
   // Route to get the result of user code submission
+
   app.get("/judge0_webhook_submit_user_code", (req, res) => {
     const { userName } = req.query;
 
     try {
       const batchSubmissionResultDataList =
         batchSubmissionResultDataMap.get(userName);
+      const responseTokenData = userTokenDataMap.get(userName);
 
       if (
         batchSubmissionResultDataList &&
-        batchSubmissionResultDataList.length > 0
+        batchSubmissionResultDataList.length > 0 &&
+        responseTokenData
       ) {
         const sortedData = sortByToken(
           responseTokenData,
           batchSubmissionResultDataList
         );
         res.status(200).json(sortedData);
+
+        // Remove the token data associated with the user
+        userTokenDataMap.delete(userName);
         batchSubmissionResultDataMap.delete(userName);
       } else {
         res.status(404).send("No submission result data available.");
@@ -239,6 +246,7 @@ async function initializeApp() {
     } catch (error) {
       console.error("Error occurred while processing the request:", error);
       res.status(500).send("An error occurred while processing the request.");
+      userTokenDataMap.delete(userName);
       batchSubmissionResultDataMap.delete(userName);
     }
   });
