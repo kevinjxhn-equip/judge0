@@ -52,13 +52,13 @@ const CustomTestCaseSection = ({
         <Box
           flex={1}
           bg={"#1e283b"}
-          minH={"10rem"}
+          h={"10rem"}
           p={2}
           border={"1px solid"}
           borderRadius={4}
           color={isCustomError ? "red.400" : "#309F57"}
           borderColor={isCustomError ? "red.500" : "#333"}
-          overflowY={"scroll"}
+          overflow={"auto"}
           fontWeight={600}
         >
           {customTestCaseOutput

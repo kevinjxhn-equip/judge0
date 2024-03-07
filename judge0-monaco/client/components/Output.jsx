@@ -10,10 +10,7 @@ import {
   VStack,
 } from "@chakra-ui/react";
 import React from "react";
-import {
-  getResponseAfterSubmittingUserCode,
-  getResponseAfterExecutingUserCode,
-} from "../utils/api";
+import { getResponseAfterSubmittingUserCode } from "../utils/api";
 import CustomTestCaseSection from "./CustomTestCaseSection";
 import { editorRefProvider, languageProvider } from "./ProgrammingTestTemplate";
 import { getResponseAfterExecutingUserCustomInputCode } from "../utils/api";
@@ -119,7 +116,7 @@ const Output = () => {
 
       if (result.error) {
         setIsCustomError(true);
-        setCustomTestCaseOutput(["Incorrect input format."]);
+        setCustomTestCaseOutput([result.error]);
         return;
       }
 
@@ -398,7 +395,9 @@ const Output = () => {
                     flex={1}
                     direction={"column"}
                     justify={
-                      item.color === "green.500" || item.color === "orange.500" ? "center" : "flex-start"
+                      item.color === "green.500" || item.color === "orange.500"
+                        ? "center"
+                        : "flex-start"
                     }
                     overflow={"auto"}
                     w="100%"

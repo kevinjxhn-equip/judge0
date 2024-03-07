@@ -3,6 +3,7 @@ import dotenv from "dotenv";
 import cors from "cors";
 import axios from "axios";
 import bodyParser from "body-parser";
+import { TEST_CASES } from "./constants.js";
 
 dotenv.config();
 
@@ -53,17 +54,67 @@ function sortByToken(tokenData, dataToSort) {
   });
 }
 
+const appendSourceCodeBasedOnLanguageAndFunctionName = (
+  language,
+  sourceCode,
+  functionName,
+  inputTestCases
+) => {
+  const sourceCodeArray = [];
+
+  const languagePrintFunction = {
+    63: "console.log", // JavaScript
+    71: "print", // Python
+    74: "console.log", // TypeScript
+    62: "System.out.println", // Java
+    51: "Console.WriteLine", // C#
+    68: "echo", // PHP
+  };
+
+  const serializeArgument = (arg) => {
+    if (typeof arg === "string") return `${arg}`;
+    if (Array.isArray(arg)) return `[${arg.map(serializeArgument).join(", ")}]`;
+    if (typeof arg === "object") return JSON.stringify(arg);
+    return arg.toString();
+  };
+
+  // Convert single inputTestCase to an array if it's not already an array
+  if (!Array.isArray(inputTestCases)) {
+    inputTestCases = [inputTestCases];
+  }
+
+  for (let inputTestCase of inputTestCases) {
+    const printFunction = languagePrintFunction[language];
+    const args = Array.isArray(inputTestCase)
+      ? inputTestCase.map(serializeArgument)
+      : [serializeArgument(inputTestCase)];
+
+    console.log(args)
+    const sourceCodeLine = `${sourceCode}\n${printFunction}(${functionName}(${args.join(
+      ", "
+    )}))`;
+    sourceCodeArray.push(sourceCodeLine);
+  }
+  return sourceCodeArray;
+};
+
 // Main function to run the app
 async function initializeApp() {
   app.post("/execute_user_code", async (req, res) => {
-    const { langId, sourceCode, expected_output, stdin } = req.body;
+    const { langId, sourceCode, stdin } = req.body;
+
+    const sourceCodeArray = appendSourceCodeBasedOnLanguageAndFunctionName(
+      langId,
+      sourceCode,
+      langId === "71" ? "first_character" : "firstCharacter",
+      stdin
+    );
 
     const data = {
       language_id: langId,
-      source_code: sourceCode,
+      source_code: sourceCodeArray[0],
       callback_url: `http://host.docker.internal:${port}/judge0_webhook_user_code_execution`,
       stdin,
-      expected_output,
     };
 
     try {
@@ -80,8 +131,6 @@ async function initializeApp() {
   app.put("/judge0_webhook_user_code_execution", (req, res) => {
     submissionResultData = decodeBase64(req.body);
 
-    console.log("submissionResultData", submissionResultData);
-
     res.status(200).json({ message: "Webhook recieved successfully." });
   });
 
@@ -96,18 +145,28 @@ async function initializeApp() {
   });
 
   app.post("/submit_user_code", async (req, res) => {
-    const updatedRequestBody = {
-      submissions: req.body.submissions.map((submission) => ({
-        ...submission,
-        callback_url: `http://host.docker.internal:${port}/judge0_webhook_submit_user_code`,
-      })),
-    };
+    const { langId, sourceCode } = req.body;
+
+    const sourceCodeArray = appendSourceCodeBasedOnLanguageAndFunctionName(
+      langId,
+      sourceCode,
+      langId === "71" ? "first_character" : "firstCharacter",
+      TEST_CASES.inputTestCases
+    );
+
+    const submissions = sourceCodeArray.map((sourceCode, index) => ({
+      language_id: langId,
+      source_code: sourceCode,
+      expected_output: TEST_CASES.outputTestCases[index],
+      stdin: TEST_CASES.inputTestCases[index],
+      callback_url: `http://host.docker.internal:${port}/judge0_webhook_submit_user_code`,
+    }));
+
 
     try {
-      const response = await judge0Api.post(
-        "/submissions/batch",
-        updatedRequestBody
-      );
+      const response = await judge0Api.post("/submissions/batch", {
+        submissions,
+      });
 
       responseTokenData = response.data;
 
@@ -123,7 +182,6 @@ async function initializeApp() {
     const decodedSubmissionResultData = decodeBase64(req.body);
     batchSubmissionResultDataList.push(decodedSubmissionResultData); // Push received object into the array
 
-    console.log("Received object:", decodedSubmissionResultData);
 
     res.status(200).json({ message: "Webhook recieved successfully." });
   });

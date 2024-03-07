@@ -25,8 +25,3 @@ export const JUDGE0_LANGS_ID = {
   csharp: "51",
   php: "68",
 };
-
-export const TEST_CASES = {
-  inputTestCases: [["aaa"], ["bc"]],
-  outputTestCases: ["a", "b"],
-}
