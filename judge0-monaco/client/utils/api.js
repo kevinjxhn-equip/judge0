@@ -58,13 +58,13 @@ export const getResponseAfterExecutingUserCustomInputCode = async (
     return { errorId: 1, error: "Custom input is required" };
   }
 
-  const sanitizedCustomInput = customInput.replace(/'/g, '"');
+  // const sanitizedCustomInput = customInput.replace(/'/g, '"');
 
-  try {
-    JSON.parse(sanitizedCustomInput);
-  } catch (error) {
-    return { errorId: 2, error: "Invalid custom input format" };
-  }
+  // try {
+  //   JSON.parse(sanitizedCustomInput);
+  // } catch (error) {
+  //   return { errorId: 2, error: "Invalid custom input format" };
+  // }
 
   try {
     await axios.post(`${baseUrl}/execute_user_code`, {

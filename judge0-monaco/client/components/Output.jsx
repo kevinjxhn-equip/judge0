@@ -214,9 +214,9 @@ const Output = () => {
           </Button>
         </ButtonGroup>
 
-        {/* Slack task */}
-        {isCustomTestCaseSectionVisible ? (
-          <Flex align={"center"}>
+        <Flex align={"center"}>
+          {/* Slack task */}
+          {isCustomTestCaseSectionVisible ? (
             <Text fontWeight={600}>
               {loadingState.isCustomTestLoading
                 ? "Running..."
@@ -226,9 +226,7 @@ const Output = () => {
                   : `${userName}, your custom input ran.`
                 : "Check now"}
             </Text>
-          </Flex>
-        ) : (
-          <Flex align={"center"}>
+          ) : (
             <Text fontWeight={600}>
               {loadingState.isSubmitLoading
                 ? "Running..."
@@ -241,8 +239,8 @@ const Output = () => {
                   : `${userName}, your answer is right.`
                 : "Check now"}
             </Text>
-          </Flex>
-        )}
+          )}
+        </Flex>
 
         <ButtonGroup>
           {isCustomTestCaseSectionVisible ? (
