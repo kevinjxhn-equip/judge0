@@ -3,12 +3,13 @@ import { JUDGE0_LANGS_ID } from "./constants";
 
 const baseUrl = "http://localhost:3000";
 
-// Polling function to repeatedly check for response
-const pollForResult = (serverUrl) => {
+const pollForResult = (serverUrl, userName) => {
   return new Promise((resolve, reject) => {
     const pollInterval = setInterval(async () => {
       try {
-        const response = await axios.get(`${baseUrl}/${serverUrl}`);
+        const response = await axios.get(`${baseUrl}/${serverUrl}`, {
+          params: { userName },
+        });
         if (response.status === 200) {
           clearInterval(pollInterval); // Stop polling
           resolve(response.data); // Resolve with submission result data
@@ -24,38 +25,10 @@ const pollForResult = (serverUrl) => {
   });
 };
 
-// export const getResponseAfterExecutingUserCode = async (
-//   language,
-//   sourceCode
-// ) => {
-//   const langId = JUDGE0_LANGS_ID[language];
-//   const testInput = [TEST_CASES.inputTestCases[0]];
-
-//   const sourceCodeArray = appendSourceCodeBasedOnLanguageAndFunctionName(
-//     language,
-//     sourceCode,
-//     language === "python" ? "first_character" : "firstCharacter",
-//     testInput
-//   );
-
-//   try {
-//     await axios.post(`${baseUrl}/execute_user_code`, {
-//       langId,
-//       sourceCode: sourceCodeArray[0],
-//       expected_output: TEST_CASES.outputTestCases[0],
-//       stdin: testInput[0],
-//     });
-
-//     return await pollForResult("judge0_webhook_user_code_execution");
-//   } catch (error) {
-//     console.log(error);
-//     throw new Error("Error while executing user's code.");
-//   }
-// };
-
 export const getResponseAfterSubmittingUserCode = async (
   language,
-  sourceCode
+  sourceCode,
+  userName
 ) => {
   const langId = JUDGE0_LANGS_ID[language];
 
@@ -63,9 +36,10 @@ export const getResponseAfterSubmittingUserCode = async (
     await axios.post(`${baseUrl}/submit_user_code`, {
       langId,
       sourceCode,
+      userName,
     });
 
-    return await pollForResult("judge0_webhook_submit_user_code");
+    return await pollForResult("judge0_webhook_submit_user_code", userName);
   } catch (error) {
     console.log(error);
     throw new Error("Error while submitting user's code.");
@@ -75,7 +49,8 @@ export const getResponseAfterSubmittingUserCode = async (
 export const getResponseAfterExecutingUserCustomInputCode = async (
   language,
   sourceCode,
-  customInput
+  customInput,
+  userName
 ) => {
   const langId = JUDGE0_LANGS_ID[language];
 
@@ -96,9 +71,10 @@ export const getResponseAfterExecutingUserCustomInputCode = async (
       langId,
       sourceCode,
       stdin: customInput,
+      userName,
     });
 
-    return await pollForResult("judge0_webhook_user_code_execution");
+    return await pollForResult("judge0_webhook_user_code_execution", userName);
   } catch (error) {
     console.log(error);
     throw new Error("Error while executing user's custom input code.");

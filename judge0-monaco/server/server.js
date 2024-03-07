@@ -10,17 +10,21 @@ dotenv.config();
 const app = express();
 const port = process.env.SERVER_PORT || 3000;
 
+// Middlewares
 app.use(express.json());
 app.use(cors());
 app.use(bodyParser.json());
 
+// Judge0 API instance
 const judge0Api = axios.create({
   baseURL: "http://127.0.0.1:2358",
 });
 
-let submissionResultData = null;
-let batchSubmissionResultDataList = [];
+
 let responseTokenData = null;
+
+const userCustomSubmissionResultMap = new Map();
+const batchSubmissionResultDataMap = new Map();
 
 // Function to decode base64 data from Judge0
 const decodeBase64 = (data) => {
@@ -42,6 +46,7 @@ const decodeBase64 = (data) => {
   return decodedData;
 };
 
+// Function to sort the data based on token
 function sortByToken(tokenData, dataToSort) {
   return dataToSort.sort((a, b) => {
     const tokenA = tokenData.findIndex(
@@ -54,6 +59,7 @@ function sortByToken(tokenData, dataToSort) {
   });
 }
 
+// Function to append source code based on language and function name
 const appendSourceCodeBasedOnLanguageAndFunctionName = (
   language,
   sourceCode,
@@ -89,7 +95,6 @@ const appendSourceCodeBasedOnLanguageAndFunctionName = (
       ? inputTestCase.map(serializeArgument)
       : [serializeArgument(inputTestCase)];
 
-    console.log(args)
     const sourceCodeLine = `${sourceCode}\n${printFunction}(${functionName}(${args.join(
       ", "
     )}))`;
@@ -100,8 +105,9 @@ const appendSourceCodeBasedOnLanguageAndFunctionName = (
 
 // Main function to run the app
 async function initializeApp() {
+  // Route for executing user code
   app.post("/execute_user_code", async (req, res) => {
-    const { langId, sourceCode, stdin } = req.body;
+    const { langId, sourceCode, stdin, userName } = req.body;
 
     const sourceCodeArray = appendSourceCodeBasedOnLanguageAndFunctionName(
       langId,
@@ -113,11 +119,13 @@ async function initializeApp() {
     const data = {
       language_id: langId,
       source_code: sourceCodeArray[0],
-      callback_url: `http://host.docker.internal:${port}/judge0_webhook_user_code_execution`,
+      callback_url: `http://host.docker.internal:${port}/judge0_webhook_user_code_execution?userName=${userName}`,
       stdin,
     };
 
     try {
+      userCustomSubmissionResultMap.set(userName, null);
+
       await judge0Api.post("/submissions", data);
 
       res
@@ -128,24 +136,37 @@ async function initializeApp() {
     }
   });
 
-  app.put("/judge0_webhook_user_code_execution", (req, res) => {
-    submissionResultData = decodeBase64(req.body);
+  // Route for handling webhook from Judge0 after user code execution
+  app.put("/judge0_webhook_user_code_execution/", (req, res) => {
+    const { userName } = req.query;
+
+    userCustomSubmissionResultMap.set(userName, decodeBase64(req.body));
 
     res.status(200).json({ message: "Webhook recieved successfully." });
   });
 
+  // Route to get the result of user code execution
   app.get("/judge0_webhook_user_code_execution", (req, res) => {
-    if (submissionResultData) {
-      res.status(200).json(submissionResultData);
-      submissionResultData = null;
-    } else {
-      res.status(404).send("No submission result data available.");
-      submissionResultData = null;
+    const { userName } = req.query;
+
+    try {
+      const submissionResultData = userCustomSubmissionResultMap.get(userName);
+
+      if (submissionResultData) {
+        res.status(200).json(submissionResultData);
+        userCustomSubmissionResultMap.delete(userName);
+      } else {
+        res.status(404).send("No submission result data available.");
+      }
+    } catch (error) {
+      console.error("Error occurred while processing the request:", error);
+      res.status(500).send("An error occurred while processing the request.");
     }
   });
 
+  // Route to submit user code against sample test cases
   app.post("/submit_user_code", async (req, res) => {
-    const { langId, sourceCode } = req.body;
+    const { langId, sourceCode, userName } = req.body;
 
     const sourceCodeArray = appendSourceCodeBasedOnLanguageAndFunctionName(
       langId,
@@ -159,9 +180,8 @@ async function initializeApp() {
       source_code: sourceCode,
       expected_output: TEST_CASES.outputTestCases[index],
       stdin: TEST_CASES.inputTestCases[index],
-      callback_url: `http://host.docker.internal:${port}/judge0_webhook_submit_user_code`,
+      callback_url: `http://host.docker.internal:${port}/judge0_webhook_submit_user_code?userName=${userName}`,
     }));
-
 
     try {
       const response = await judge0Api.post("/submissions/batch", {
@@ -178,26 +198,48 @@ async function initializeApp() {
     }
   });
 
+  // Route to handle webhook from Judge0 after submitting user code
   app.put("/judge0_webhook_submit_user_code", (req, res) => {
-    const decodedSubmissionResultData = decodeBase64(req.body);
-    batchSubmissionResultDataList.push(decodedSubmissionResultData); // Push received object into the array
+    const { userName } = req.query;
 
+    const decodedSubmissionResultData = decodeBase64(req.body);
+
+    if (!batchSubmissionResultDataMap.has(userName)) {
+      batchSubmissionResultDataMap.set(userName, []);
+    }
+
+    batchSubmissionResultDataMap
+      .get(userName)
+      .push(decodedSubmissionResultData);
 
     res.status(200).json({ message: "Webhook recieved successfully." });
   });
 
+  // Route to get the result of user code submission
   app.get("/judge0_webhook_submit_user_code", (req, res) => {
-    if (batchSubmissionResultDataList.length > 0) {
-      const sortedData = sortByToken(
-        responseTokenData,
-        batchSubmissionResultDataList
-      );
+    const { userName } = req.query;
 
-      res.status(200).json(sortedData);
-      batchSubmissionResultDataList = [];
-    } else {
-      res.status(404).send("No submission result data available.");
-      batchSubmissionResultDataList = [];
+    try {
+      const batchSubmissionResultDataList =
+        batchSubmissionResultDataMap.get(userName);
+
+      if (
+        batchSubmissionResultDataList &&
+        batchSubmissionResultDataList.length > 0
+      ) {
+        const sortedData = sortByToken(
+          responseTokenData,
+          batchSubmissionResultDataList
+        );
+        res.status(200).json(sortedData);
+        batchSubmissionResultDataMap.delete(userName);
+      } else {
+        res.status(404).send("No submission result data available.");
+      }
+    } catch (error) {
+      console.error("Error occurred while processing the request:", error);
+      res.status(500).send("An error occurred while processing the request.");
+      batchSubmissionResultDataMap.delete(userName);
     }
   });
 

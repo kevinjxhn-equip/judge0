@@ -3,11 +3,7 @@ import {
   Button,
   ButtonGroup,
   Flex,
-  Grid,
-  GridItem,
   Text,
-  useToast,
-  VStack,
 } from "@chakra-ui/react";
 import React from "react";
 import { getResponseAfterSubmittingUserCode } from "../utils/api";
@@ -16,8 +12,6 @@ import { editorRefProvider, languageProvider } from "./ProgrammingTestTemplate";
 import { getResponseAfterExecutingUserCustomInputCode } from "../utils/api";
 
 const Output = () => {
-  // const [isError, setIsError] = React.useState(false);
-  // const [output, setOutput] = React.useState(null);
   const [isCustomTestCaseSectionVisible, setIsCustomTestCaseSectionVisible] =
     React.useState(false);
 
@@ -35,68 +29,7 @@ const Output = () => {
   const editorRef = React.useContext(editorRefProvider);
   const activeLanguage = React.useContext(languageProvider);
 
-  // const runUserCodeAndUpdateOutput = async () => {
-  //   const sourceCode = editorRef.current.getValue();
-
-  //   if (!sourceCode) return;
-
-  //   try {
-  //     setLoadingState((prevState) => ({
-  //       ...prevState,
-  //       isRunCodeLoading: true,
-  //     }));
-
-  //     const result = await getResponseAfterExecutingUserCode(
-  //       activeLanguage,
-  //       sourceCode
-  //     );
-
-  //     console.log(result);
-  //     const statusId = result.status.id;
-
-  // // Correct Answer
-  // if (statusId === 3) {
-  //   setIsError(false);
-  //   setOutput(result.stdout.split("\n"));
-
-  //   // Wrong Answer
-  // } else if (statusId === 4) {
-  //   setIsError(false);
-
-  //   if (
-  //     result.stderr === null &&
-  //     (!result.stdout || result.stdout.trim() === "")
-  //   ) {
-  //     setOutput(["No output from the code"]);
-  //   } else {
-  //     setOutput(result.stdout.split("\n"));
-  //   }
-
-  //   // Compilation Error
-  // } else if (statusId === 6) {
-  //   setIsError(true);
-  //   setOutput(result.compile_output.split("\n"));
-
-  //   // Time Limit Exceeded
-  // } else if (statusId === 5) {
-  //   setIsError(true);
-  //   setOutput(["Time Limit Exceeded"]);
-
-  //   // Runtime Error and Internal Error
-  // } else {
-  //   setIsError(true);
-  //   setOutput(result.stderr.split("\n"));
-  // }
-  //   } catch (error) {
-  //     console.log(error);
-  //   } finally {
-  //     setLoadingState((prevState) => ({
-  //       ...prevState,
-  //       isRunCodeLoading: false,
-  //     }));
-  //   }
-  // };
-
+  // function to run custom test case
   const runCustomTestCase = async () => {
     const sourceCode = editorRef.current.getValue();
 
@@ -111,7 +44,8 @@ const Output = () => {
       const result = await getResponseAfterExecutingUserCustomInputCode(
         activeLanguage,
         sourceCode,
-        customInput
+        customInput,
+        "kevin"
       );
 
       if (result.error) {
@@ -165,6 +99,7 @@ const Output = () => {
     }
   };
 
+  // function to submit code against sample test cases
   const submitCode = async () => {
     const sourceCode = editorRef.current.getValue();
 
@@ -174,7 +109,8 @@ const Output = () => {
       setLoadingState((prevState) => ({ ...prevState, isSubmitLoading: true }));
       const result = await getResponseAfterSubmittingUserCode(
         activeLanguage,
-        sourceCode
+        sourceCode,
+        "kevin"
       );
 
       console.log(result);
@@ -183,6 +119,7 @@ const Output = () => {
         const statusId = item.status.id;
         let output;
 
+        // Correct Answer
         if (statusId === 3) {
           output = {
             text: item.stdout.split("\n"),
@@ -191,7 +128,9 @@ const Output = () => {
         } else {
           let errorMessage;
           let color;
+
           switch (statusId) {
+            // Wrong Answer
             case 4:
               errorMessage =
                 item.stderr === null &&
@@ -200,14 +139,20 @@ const Output = () => {
                   : item.stdout.split("\n");
               color = "orange.500";
               break;
+
+            // Compilation Error
             case 6:
               errorMessage = item.compile_output.split("\n");
               color = "red.500";
               break;
+
+            // Time Limit Exceeded
             case 5:
               errorMessage = ["Time Limit Exceeded"];
               color = "red.500";
               break;
+
+            // Runtime Error and Internal Error
             default:
               errorMessage = item.stderr.split("\n");
               color = "red.500";
@@ -265,19 +210,6 @@ const Output = () => {
         </ButtonGroup>
 
         <ButtonGroup>
-          {/* {!isCustomTestCaseSectionVisible && (
-            <Button
-              variant={"solid"}
-              colorScheme="yellow"
-              onClick={runUserCodeAndUpdateOutput}
-              isLoading={loadingState.isRunCodeLoading}
-            >
-              <Flex align={"center"} gap={2}>
-                Run Your Code
-              </Flex>
-            </Button>
-          )} */}
-
           {isCustomTestCaseSectionVisible ? (
             <Button
               colorScheme="purple"
@@ -298,10 +230,6 @@ const Output = () => {
               Run Tests
             </Button>
           )}
-
-          {/* <Button variant={"solid"} colorScheme="whatsapp">
-            Submit
-          </Button> */}
         </ButtonGroup>
       </Flex>
 
@@ -314,22 +242,6 @@ const Output = () => {
             setCustomInput={setCustomInput}
           />
         ) : (
-          // <Box
-          //   w={"100%"}
-          //   bg={"#1e283b"}
-          //   minH={{ base: "10rem", xl: "13rem" }}
-          //   p={2}
-          //   mt={1}
-          //   borderRadius={4}
-          //   color={isError ? "red.400" : "#309F57"}
-          //   borderColor={isError ? "red.500" : "#333"}
-          //   overflowY={"scroll"}
-          //   fontWeight={600}
-          // >
-          //   {output
-          //     ? output.map((line, i) => <Text key={i}>{line}</Text>)
-          //     : 'Click "Run Your Code" to see the output here'}
-          // </Box>
           <Flex>
             <Flex
               direction="column"

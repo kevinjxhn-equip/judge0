@@ -34,18 +34,18 @@ const CustomTestCaseSection = ({
             placeholder="Add a custom test case here..."
             minH={"10rem"}
             variant="filled"
-            bg="#f3f4f6" // Set the background color to gray.100
-            color="gray.700" // Set the text color to a darker shade of gray
-            _hover={{ bg: "#f3f4f6" }} // Adjust background color on hover
+            bg="#f3f4f6"
+            color="gray.700"
+            _hover={{ bg: "#f3f4f6" }}
             _focus={{
               bg: "#f3f4f6",
               borderColor: "blue.400",
               outline: "none",
-            }} // Adjust background color and border color on focus
+            }}
             value={customInput}
             onChange={(e) => setCustomInput(e.target.value)}
             sx={{
-              "&::placeholder": { color: "gray.800", fontWeight: "600" }, // Change placeholder color using CSS
+              "&::placeholder": { color: "gray.800", fontWeight: "600" },
             }}
           />
         </Box>

@@ -1,9 +1,5 @@
 import {
-  Box,
-  Divider,
-  Flex,
   Table,
-  TableCaption,
   TableContainer,
   Tbody,
   Td,
@@ -15,12 +11,7 @@ import React from "react";
 
 const TestCasesTable = () => {
   return (
-    <TableContainer
-      border={"1px"}
-      p={2}
-      pb={7}
-      borderColor={"#d1d5da"}
-    >
+    <TableContainer border={"1px"} p={2} pb={7} borderColor={"#d1d5da"}>
       <Table>
         <Thead>
           <Tr>
