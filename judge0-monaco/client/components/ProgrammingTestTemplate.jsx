@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useRef, createContext } from "react";
 import { Editor } from "@monaco-editor/react";
 import {
   Box,
@@ -14,15 +14,15 @@ import Output from "./Output";
 import QuestionSection from "./QuestionSection";
 import { MoonIcon, SunIcon } from "@chakra-ui/icons";
 
-export const editorRefProvider = React.createContext();
-export const languageProvider = React.createContext();
+export const editorRefProvider = createContext();
+export const languageProvider = createContext();
 
 const ProgrammingTestTemplate = () => {
-  const [value, setValue] = React.useState("");
-  const [activeLanguage, setActiveLanguage] = React.useState("javascript");
-  const [isEditorDark, setIsEditorDark] = React.useState(true);
+  const [value, setValue] = useState("");
+  const [activeLanguage, setActiveLanguage] = useState("javascript");
+  const [isEditorDark, setIsEditorDark] = useState(true);
 
-  const editorRef = React.useRef(null);
+  const editorRef = useRef(null);
 
   const onMount = (editor) => {
     editorRef.current = editor;

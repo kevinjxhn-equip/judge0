@@ -1,11 +1,5 @@
-import {
-  Box,
-  Button,
-  ButtonGroup,
-  Flex,
-  Text,
-} from "@chakra-ui/react";
-import React from "react";
+import { Box, Button, ButtonGroup, Flex, Text } from "@chakra-ui/react";
+import React, { useState, useEffect, useContext } from "react";
 import { getResponseAfterSubmittingUserCode } from "../utils/api";
 import CustomTestCaseSection from "./CustomTestCaseSection";
 import { editorRefProvider, languageProvider } from "./ProgrammingTestTemplate";
@@ -13,21 +7,32 @@ import { getResponseAfterExecutingUserCustomInputCode } from "../utils/api";
 
 const Output = () => {
   const [isCustomTestCaseSectionVisible, setIsCustomTestCaseSectionVisible] =
-    React.useState(false);
+    useState(false);
+  const [customInput, setCustomInput] = useState("");
+  const [isCustomError, setIsCustomError] = useState(false);
+  const [customTestCaseOutput, setCustomTestCaseOutput] = useState(null);
+  const [batchOutput, setBatchOutput] = useState(null);
 
-  const [customInput, setCustomInput] = React.useState("");
-  const [isCustomError, setIsCustomError] = React.useState(false);
-  const [customTestCaseOutput, setCustomTestCaseOutput] = React.useState(null);
-  const [batchOutput, setBatchOutput] = React.useState(null);
+  const [userName, setUserName] = useState("");
 
-  const [loadingState, setLoadingState] = React.useState({
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+
+    const userNameParam = params.get("userName");
+
+    if (userNameParam) {
+      setUserName(userNameParam);
+      console.log(userName);
+    }
+  }, [userName]);
+
+  const [loadingState, setLoadingState] = useState({
     isSubmitLoading: false,
-    isRunCodeLoading: false,
     isCustomTestLoading: false,
   });
 
-  const editorRef = React.useContext(editorRefProvider);
-  const activeLanguage = React.useContext(languageProvider);
+  const editorRef = useContext(editorRefProvider);
+  const activeLanguage = useContext(languageProvider);
 
   // function to run custom test case
   const runCustomTestCase = async () => {
@@ -45,7 +50,7 @@ const Output = () => {
         activeLanguage,
         sourceCode,
         customInput,
-        "kevin"
+        userName
       );
 
       if (result.error) {
@@ -110,7 +115,7 @@ const Output = () => {
       const result = await getResponseAfterSubmittingUserCode(
         activeLanguage,
         sourceCode,
-        "kevin"
+        userName
       );
 
       console.log(result);
@@ -208,6 +213,36 @@ const Output = () => {
             Custom Input Testcases
           </Button>
         </ButtonGroup>
+
+        {/* Slack task */}
+        {isCustomTestCaseSectionVisible ? (
+          <Flex align={"center"}>
+            <Text fontWeight={600}>
+              {loadingState.isCustomTestLoading
+                ? "Running..."
+                : customTestCaseOutput
+                ? isCustomError
+                  ? `${userName}, your custom input didn't run due to some error.`
+                  : `${userName}, your custom input ran.`
+                : "Check now"}
+            </Text>
+          </Flex>
+        ) : (
+          <Flex align={"center"}>
+            <Text fontWeight={600}>
+              {loadingState.isSubmitLoading
+                ? "Running..."
+                : batchOutput
+                ? batchOutput.some(
+                    (item) =>
+                      item.color === "red.500" || item.color === "orange.500"
+                  )
+                  ? `${userName}, your answer is wrong.`
+                  : `${userName}, your answer is right.`
+                : "Check now"}
+            </Text>
+          </Flex>
+        )}
 
         <ButtonGroup>
           {isCustomTestCaseSectionVisible ? (

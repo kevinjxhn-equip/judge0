@@ -20,8 +20,6 @@ const judge0Api = axios.create({
   baseURL: "http://127.0.0.1:2358",
 });
 
-
-
 const userCustomSubmissionResultMap = new Map();
 const batchSubmissionResultDataMap = new Map();
 const userTokenDataMap = new Map();
@@ -202,7 +200,6 @@ async function initializeApp() {
   // Route to handle webhook from Judge0 after submitting user code
   app.put("/judge0_webhook_submit_user_code", (req, res) => {
     const { userName } = req.query;
-
     const decodedSubmissionResultData = decodeBase64(req.body);
 
     if (!batchSubmissionResultDataMap.has(userName)) {
@@ -217,7 +214,6 @@ async function initializeApp() {
   });
 
   // Route to get the result of user code submission
-
   app.get("/judge0_webhook_submit_user_code", (req, res) => {
     const { userName } = req.query;
 
