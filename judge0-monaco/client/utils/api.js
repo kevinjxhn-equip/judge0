@@ -28,7 +28,8 @@ const pollForResult = (serverUrl, userName) => {
 export const getResponseAfterSubmittingUserCode = async (
   language,
   sourceCode,
-  userName
+  userName,
+  functionName
 ) => {
   const langId = JUDGE0_LANGS_ID[language];
 
@@ -37,6 +38,7 @@ export const getResponseAfterSubmittingUserCode = async (
       langId,
       sourceCode,
       userName,
+      functionName,
     });
 
     return await pollForResult("judge0_webhook_submit_user_code", userName);
@@ -50,7 +52,8 @@ export const getResponseAfterExecutingUserCustomInputCode = async (
   language,
   sourceCode,
   customInput,
-  userName
+  userName,
+  functionName
 ) => {
   const langId = JUDGE0_LANGS_ID[language];
 
@@ -58,20 +61,13 @@ export const getResponseAfterExecutingUserCustomInputCode = async (
     return { errorId: 1, error: "Custom input is required" };
   }
 
-  // const sanitizedCustomInput = customInput.replace(/'/g, '"');
-
-  // try {
-  //   JSON.parse(sanitizedCustomInput);
-  // } catch (error) {
-  //   return { errorId: 2, error: "Invalid custom input format" };
-  // }
-
   try {
     await axios.post(`${baseUrl}/execute_user_code`, {
       langId,
       sourceCode,
       stdin: customInput,
       userName,
+      functionName,
     });
 
     return await pollForResult("judge0_webhook_user_code_execution", userName);

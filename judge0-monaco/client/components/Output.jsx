@@ -2,7 +2,11 @@ import { Box, Button, ButtonGroup, Flex, Text } from "@chakra-ui/react";
 import React, { useState, useEffect, useContext } from "react";
 import { getResponseAfterSubmittingUserCode } from "../utils/api";
 import CustomTestCaseSection from "./CustomTestCaseSection";
-import { editorRefProvider, languageProvider } from "./ProgrammingTestTemplate";
+import {
+  editorRefProvider,
+  languageProvider,
+  questionTypeProvider,
+} from "./ProgrammingTestTemplate";
 import { getResponseAfterExecutingUserCustomInputCode } from "../utils/api";
 
 const Output = () => {
@@ -14,6 +18,17 @@ const Output = () => {
   const [batchOutput, setBatchOutput] = useState(null);
 
   const [userName, setUserName] = useState("");
+
+  const questionType = useContext(questionTypeProvider);
+  const editorRef = useContext(editorRefProvider);
+  const activeLanguage = useContext(languageProvider);
+
+  let functionName;
+  if (questionType === "string") {
+    functionName = "firstCharacter";
+  } else if (questionType === "matrix") {
+    functionName = "calculateMatrixAverage";
+  }
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -31,14 +46,28 @@ const Output = () => {
     isCustomTestLoading: false,
   });
 
-  const editorRef = useContext(editorRefProvider);
-  const activeLanguage = useContext(languageProvider);
-
   // function to run custom test case
   const runCustomTestCase = async () => {
     const sourceCode = editorRef.current.getValue();
 
     if (!sourceCode) return;
+
+    if (questionType === "matrix") {
+      let sanitisedInput;
+      try {
+        sanitisedInput = JSON.parse(customInput);
+      } catch (error) {
+        setIsCustomError(true);
+        setCustomTestCaseOutput(["Input is not in array format"]);
+      }
+
+      // Input is not an array
+      if (!Array.isArray(sanitisedInput)) {
+        setIsCustomError(true);
+        setCustomTestCaseOutput(["Input is not an array"]);
+        return;
+      }
+    }
 
     try {
       setLoadingState((prevState) => ({
@@ -50,7 +79,8 @@ const Output = () => {
         activeLanguage,
         sourceCode,
         customInput,
-        userName
+        userName,
+        functionName
       );
 
       if (result.error) {
@@ -115,7 +145,8 @@ const Output = () => {
       const result = await getResponseAfterSubmittingUserCode(
         activeLanguage,
         sourceCode,
-        userName
+        userName,
+        functionName
       );
 
       console.log(result);
@@ -298,27 +329,58 @@ const Output = () => {
                   </Box>
                 </Box>
               </Flex>
-              <Flex
-                justify="space-between"
-                align="center"
-                flex={1}
-                bg={"#f3f4f6"}
-              >
-                <Box flex={1} textAlign="center" p={2}>
-                  <Text fontWeight={700}>aaa</Text>
-                </Box>
-                <Box flex={1} textAlign="center" p={2}>
-                  <Text fontWeight={700}>a</Text>
-                </Box>
-              </Flex>
-              <Flex justify="space-between" align="center" flex={1}>
-                <Box flex={1} textAlign="center" p={2}>
-                  <Text fontWeight={700}>bc</Text>
-                </Box>
-                <Box flex={1} textAlign="center" p={2}>
-                  <Text fontWeight={700}>b</Text>
-                </Box>
-              </Flex>
+
+              {questionType === "string" ? (
+                <>
+                  <Flex
+                    justify="space-between"
+                    align="center"
+                    flex={1}
+                    bg={"#f3f4f6"}
+                  >
+                    <Box flex={1} textAlign="center" p={2}>
+                      <Text fontWeight={700}>aaa</Text>
+                    </Box>
+                    <Box flex={1} textAlign="center" p={2}>
+                      <Text fontWeight={700}>a</Text>
+                    </Box>
+                  </Flex>
+                  <Flex justify="space-between" align="center" flex={1}>
+                    <Box flex={1} textAlign="center" p={2}>
+                      <Text fontWeight={700}>bc</Text>
+                    </Box>
+                    <Box flex={1} textAlign="center" p={2}>
+                      <Text fontWeight={700}>b</Text>
+                    </Box>
+                  </Flex>
+                </>
+              ) : (
+                <>
+                  <Flex
+                    justify="space-between"
+                    align="center"
+                    flex={1}
+                    bg={"#f3f4f6"}
+                  >
+                    <Box flex={1} textAlign="center" p={2}>
+                      <Text fontWeight={700}>[[1, 2], [3, 4]]</Text>
+                    </Box>
+                    <Box flex={1} textAlign="center" p={2}>
+                      <Text fontWeight={700}>2.5</Text>
+                    </Box>
+                  </Flex>
+                  <Flex justify="space-between" align="center" flex={1}>
+                    <Box flex={1} textAlign="center" p={2}>
+                      <Text fontWeight={700}>
+                        [[1, 2, 3], [1, 2, 3], [1, 2, 3]]
+                      </Text>
+                    </Box>
+                    <Box flex={1} textAlign="center" p={2}>
+                      <Text fontWeight={700}>2</Text>
+                    </Box>
+                  </Flex>
+                </>
+              )}
             </Flex>
             {batchOutput && (
               <Flex flex={1} direction="column" h="13rem" align="center">

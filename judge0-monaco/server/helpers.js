@@ -74,3 +74,20 @@ export const appendSourceCodeBasedOnLanguageAndFunctionName = (
   }
   return sourceCodeArray;
 };
+
+export const camelToSnake = (camelCase) => {
+  let snakeCase = '';
+  for (let i = 0; i < camelCase.length; i++) {
+      const char = camelCase[i];
+      if (char === char.toUpperCase()) {
+          snakeCase += '_' + char.toLowerCase();
+      } else {
+          snakeCase += char;
+      }
+  }
+  // If the string starts with an uppercase letter, lowercase the first letter in the snake_case string
+  if (snakeCase[0] === '_') {
+      snakeCase = snakeCase.substring(1);
+  }
+  return snakeCase;
+}

@@ -3,11 +3,12 @@ import dotenv from "dotenv";
 import cors from "cors";
 import axios from "axios";
 import bodyParser from "body-parser";
-import { TEST_CASES } from "./testcases.js";
+import { TEST_CASES_STRING, TEST_CASES_MATRIX } from "./testcases.js";
 import {
   decodeBase64,
   sortByToken,
   appendSourceCodeBasedOnLanguageAndFunctionName,
+  camelToSnake,
 } from "./helpers.js";
 
 dotenv.config();
@@ -34,11 +35,16 @@ async function initializeApp() {
   // Route for executing user code
   app.post("/execute_user_code", async (req, res) => {
     const { langId, sourceCode, stdin, userName } = req.body;
+    let { functionName } = req.body;
+
+    if (langId === "71") {
+      functionName = camelToSnake(functionName);
+    }
 
     const sourceCodeArray = appendSourceCodeBasedOnLanguageAndFunctionName(
       langId,
       sourceCode,
-      langId === "71" ? "first_character" : "firstCharacter",
+      functionName,
       stdin
     );
 
@@ -93,19 +99,35 @@ async function initializeApp() {
   // Route to submit user code against sample test cases
   app.post("/submit_user_code", async (req, res) => {
     const { langId, sourceCode, userName } = req.body;
+    let { functionName } = req.body;
+
+    if (langId === "71") {
+      functionName = camelToSnake(functionName);
+    }
+
+    let testCases = TEST_CASES_STRING;
+
+    if (
+      functionName === "calculateMatrixAverage" ||
+      functionName === "calculate_matrix_average"
+    ) {
+      testCases = TEST_CASES_MATRIX;
+    }
 
     const sourceCodeArray = appendSourceCodeBasedOnLanguageAndFunctionName(
       langId,
       sourceCode,
-      langId === "71" ? "first_character" : "firstCharacter",
-      TEST_CASES.inputTestCases
+      functionName,
+      testCases.inputTestCases
     );
+
+    console.log(sourceCodeArray)
 
     const submissions = sourceCodeArray.map((sourceCode, index) => ({
       language_id: langId,
       source_code: sourceCode,
-      expected_output: TEST_CASES.outputTestCases[index],
-      stdin: TEST_CASES.inputTestCases[index],
+      expected_output: testCases.outputTestCases[index],
+      stdin: testCases.inputTestCases[index],
       callback_url: `http://host.docker.internal:${port}/judge0_webhook_submit_user_code?userName=${userName}`,
     }));
 

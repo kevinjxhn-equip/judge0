@@ -1,15 +1,12 @@
 import React from "react";
-import {
-  Box,
-  Flex,
-  ListItem,
-  Text,
-  UnorderedList,
-} from "@chakra-ui/react";
+import { Box, Flex, ListItem, Text, UnorderedList } from "@chakra-ui/react";
 import TestCasesTable from "./TestCasesTable";
 import { Kbd } from "@chakra-ui/react";
+import { questionTypeProvider } from "./ProgrammingTestTemplate";
 
 const QuestionSection = () => {
+  const questionType = React.useContext(questionTypeProvider);
+
   return (
     <Flex
       direction={"column"}
@@ -57,15 +54,31 @@ const QuestionSection = () => {
             Problem Statement
           </Text>
         </Box>
-        <Text mt={3}>
-          Given a string <Kbd bg={"gray.100"}>s</Kbd> , you must return the
-          first character of the string.
-          <br />
-          <br />
-          You are guaranteed that the string has at least one character. Don't
-          change the name of the <Kbd bg={"gray.100"}>main</Kbd> function on the
-          right. You may write other code inside and outside the function.
-        </Text>
+
+        {questionType === "string" ? (
+          <Text mt={3}>
+            Given a string <Kbd bg={"gray.100"}>s</Kbd> , you must return the
+            first character of the string.
+            <br />
+            <br />
+            You are guaranteed that the string has at least one character. Don't
+            change the name of the <Kbd bg={"gray.100"}>main</Kbd> function on
+            the right. You may write other code inside and outside the function.
+          </Text>
+        ) : (
+          <Text mt={3}>
+            Given a matrix <Kbd bg={"gray.100"}>mat</Kbd> , you must return the
+            average of the matrix.
+            <br />
+            <br />
+            You are guaranteed that the matrix <Kbd bg={"gray.100"}>
+              mat
+            </Kbd>{" "}
+            has at least one element. Don't change the name of the{" "}
+            <Kbd bg={"gray.100"}>main</Kbd> function on the right. You may write
+            other code inside and outside the function.
+          </Text>
+        )}
       </Box>
 
       <Box p={1} m={1}>
@@ -74,7 +87,7 @@ const QuestionSection = () => {
             Test Cases
           </Text>
         </Box>
-        <Box mt={8} maxW={"15rem"}>
+        <Box mt={8} minW={"15rem"}>
           <TestCasesTable />
         </Box>
       </Box>
