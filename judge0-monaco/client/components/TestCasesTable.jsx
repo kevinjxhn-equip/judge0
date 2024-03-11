@@ -42,7 +42,7 @@ const TestCasesTable = () => {
               </Tr>
               <Tr>
                 <Td>[[1, 2, 3], [1, 2, 3], [1, 2, 3]]</Td>
-                <Td>2</Td>
+                <Td>2.0</Td>
               </Tr>
             </>
           )}

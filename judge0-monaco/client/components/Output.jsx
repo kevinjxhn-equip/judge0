@@ -376,7 +376,7 @@ const Output = () => {
                       </Text>
                     </Box>
                     <Box flex={1} textAlign="center" p={2}>
-                      <Text fontWeight={700}>2</Text>
+                      <Text fontWeight={700}>2.0</Text>
                     </Box>
                   </Flex>
                 </>
