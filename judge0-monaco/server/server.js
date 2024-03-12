@@ -1,6 +1,7 @@
 import express from "express";
 import dotenv from "dotenv";
 import cors from "cors";
+import path from "path";
 import axios from "axios";
 import bodyParser from "body-parser";
 import { TEST_CASES_STRING, TEST_CASES_MATRIX } from "./testcases.js";
@@ -20,6 +21,14 @@ const port = process.env.SERVER_PORT || 3000;
 app.use(express.json());
 app.use(cors());
 app.use(bodyParser.json());
+
+app.use(express.static(path.join(__dirname, '../client/build')));
+
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, '../client/build/index.html'));
+});
+
+
 
 // Judge0 API instance
 const judge0Api = axios.create({
