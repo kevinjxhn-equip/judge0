@@ -1,7 +1,6 @@
 import express from "express";
 import dotenv from "dotenv";
 import cors from "cors";
-import path from "path";
 import axios from "axios";
 import bodyParser from "body-parser";
 import { TEST_CASES_STRING, TEST_CASES_MATRIX } from "./testcases.js";

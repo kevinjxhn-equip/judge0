@@ -1,0 +1,14 @@
+version: '3'
+services:
+  app:
+    build: .
+    ports:
+      - "3000:3000"
+  judge0:
+    image: judge0/judge0:1.13.0
+    volumes:
+      - ./judge0-v1.13.0/judge0.conf:/judge0.conf:ro
+    ports:
+      - "2358:2358"
+    privileged: true
+    restart: always
