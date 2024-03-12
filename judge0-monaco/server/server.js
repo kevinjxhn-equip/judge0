@@ -11,8 +11,13 @@ import {
   appendSourceCodeBasedOnLanguageAndFunctionName,
   camelToSnake,
 } from "./helpers.js";
+import { fileURLToPath } from "url";
+import { dirname } from "path";
 
 dotenv.config();
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 const app = express();
 const port = process.env.SERVER_PORT || 3000;
@@ -22,13 +27,11 @@ app.use(express.json());
 app.use(cors());
 app.use(bodyParser.json());
 
-app.use(express.static(path.join(__dirname, '../client/build')));
+app.use(express.static(path.join(__dirname, "../client/build")));
 
-app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, '../client/build/index.html'));
+app.get("*", (req, res) => {
+  res.sendFile(path.join(__dirname, "../client/build/index.html"));
 });
-
-
 
 // Judge0 API instance
 const judge0Api = axios.create({
