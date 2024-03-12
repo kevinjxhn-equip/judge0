@@ -88,10 +88,9 @@ async function initializeApp() {
         res.status(200).json(submissionResultData);
         userCustomSubmissionResultMap.delete(userName);
       } else {
-        res.status(404).send("No submission result data available.");
+        res.status(204).send("No submission result data available.");
       }
     } catch (error) {
-      console.error("Error occurred while processing the request:", error);
       res.status(500).send("An error occurred while processing the request.");
     }
   });
@@ -120,8 +119,6 @@ async function initializeApp() {
       functionName,
       testCases.inputTestCases
     );
-
-    console.log(sourceCodeArray)
 
     const submissions = sourceCodeArray.map((sourceCode, index) => ({
       language_id: langId,
@@ -187,10 +184,9 @@ async function initializeApp() {
         userTokenDataMap.delete(userName);
         batchSubmissionResultDataMap.delete(userName);
       } else {
-        res.status(404).send("No submission result data available.");
+        res.status(204).send("No submission result data available.");
       }
     } catch (error) {
-      console.error("Error occurred while processing the request:", error);
       res.status(500).send("An error occurred while processing the request.");
       userTokenDataMap.delete(userName);
       batchSubmissionResultDataMap.delete(userName);

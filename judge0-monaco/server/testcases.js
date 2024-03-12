@@ -1,5 +1,5 @@
 export const TEST_CASES_STRING = {
-  inputTestCases: [["'aaa'"], ["'bc'"]],
+  inputTestCases: [['"aaa"'], ['"bc"']],
   outputTestCases: ["a", "b"],
 };
 
@@ -7,8 +7,9 @@ export const TEST_CASES_MATRIX = {
   inputTestCases: [
     [
       [
-        [1, 2],
-        [3, 4],
+        [1, 2, 3],
+        [3, 4, 5],
+        [7, 7, 7],
       ],
     ],
     [
@@ -19,5 +20,5 @@ export const TEST_CASES_MATRIX = {
       ],
     ],
   ],
-  outputTestCases: ["2.5", "2.0"],
+  outputTestCases: ["4.3", "2.0"],
 };

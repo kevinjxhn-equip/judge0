@@ -5,19 +5,30 @@ const baseUrl = "http://localhost:3000";
 
 const pollForResult = (serverUrl, userName) => {
   return new Promise((resolve, reject) => {
+    let retryCount = 0;
+    const maxRetries = 3;
+
     const pollInterval = setInterval(async () => {
       try {
         const response = await axios.get(`${baseUrl}/${serverUrl}`, {
           params: { userName },
         });
+
         if (response.status === 200) {
           clearInterval(pollInterval); // Stop polling
           resolve(response.data); // Resolve with submission result data
-        } else {
-          console.log("Polling: Response status not 200");
+        } else if (response.status === 204) {
+          retryCount++;
+          // console.log(
+          //   `Polling: Response status 204, retry attempt ${retryCount}`
+          // );
+
+          if (retryCount >= maxRetries) {
+            clearInterval(pollInterval); // Stop polling
+            reject(new Error(`Polling: Maximum retry attempts reached`));
+          }
         }
       } catch (error) {
-        console.error("Polling: Error occurred", error);
         clearInterval(pollInterval); // Stop polling on error
         reject(error);
       }
@@ -43,7 +54,6 @@ export const getResponseAfterSubmittingUserCode = async (
 
     return await pollForResult("judge0_webhook_submit_user_code", userName);
   } catch (error) {
-    console.log(error);
     throw new Error("Error while submitting user's code.");
   }
 };
@@ -72,7 +82,6 @@ export const getResponseAfterExecutingUserCustomInputCode = async (
 
     return await pollForResult("judge0_webhook_user_code_execution", userName);
   } catch (error) {
-    console.log(error);
     throw new Error("Error while executing user's custom input code.");
   }
 };

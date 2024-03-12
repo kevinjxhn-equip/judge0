@@ -37,7 +37,6 @@ const Output = () => {
 
     if (userNameParam) {
       setUserName(userNameParam);
-      console.log(userName);
     }
   }, [userName]);
 
@@ -148,8 +147,6 @@ const Output = () => {
         userName,
         functionName
       );
-
-      console.log(result);
 
       const updatedBatchOutput = result.map((item) => {
         const statusId = item.status.id;
@@ -363,10 +360,12 @@ const Output = () => {
                     bg={"#f3f4f6"}
                   >
                     <Box flex={1} textAlign="center" p={2}>
-                      <Text fontWeight={700}>[[1, 2], [3, 4]]</Text>
+                      <Text fontWeight={700}>
+                        [[1, 2, 3], [3, 4, 5], [7, 7, 7]]
+                      </Text>
                     </Box>
                     <Box flex={1} textAlign="center" p={2}>
-                      <Text fontWeight={700}>2.5</Text>
+                      <Text fontWeight={700}>4.3</Text>
                     </Box>
                   </Flex>
                   <Flex justify="space-between" align="center" flex={1}>

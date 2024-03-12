@@ -33,7 +33,7 @@ export const sortByToken = (tokenData, dataToSort) => {
 
 // Function to append source code based on language and function name
 export const appendSourceCodeBasedOnLanguageAndFunctionName = (
-  language,
+  langId,
   sourceCode,
   functionName,
   inputTestCases
@@ -43,10 +43,12 @@ export const appendSourceCodeBasedOnLanguageAndFunctionName = (
   const languagePrintFunction = {
     63: "console.log", // JavaScript
     71: "print", // Python
-    74: "console.log", // TypeScript
-    62: "System.out.println", // Java
-    51: "Console.WriteLine", // C#
-    68: "echo", // PHP
+    75: "printf", // C
+  };
+
+  const cFormatSpecifier = {
+    firstCharacter: "%c",
+    calculateMatrixAverage: "%.1f",
   };
 
   const serializeArgument = (arg) => {
@@ -62,32 +64,48 @@ export const appendSourceCodeBasedOnLanguageAndFunctionName = (
   }
 
   for (let inputTestCase of inputTestCases) {
-    const printFunction = languagePrintFunction[language];
+    const printFunction = languagePrintFunction[langId];
     const args = Array.isArray(inputTestCase)
       ? inputTestCase.map(serializeArgument)
       : [serializeArgument(inputTestCase)];
 
-    const sourceCodeLine = `${sourceCode}\n${printFunction}(${functionName}(${args.join(
-      ", "
-    )}))`;
+    let sourceCodeLine;
+    if (langId === "75") {
+      // C language
+      if (functionName === "firstCharacter") {
+        const formatSpecifier = cFormatSpecifier[functionName];
+        sourceCodeLine = `${sourceCode}\nint main() {\n${printFunction}("${formatSpecifier}", ${functionName}(${args.join(
+          ", "
+        )}));\nreturn 0;\n}`;
+      } else if (functionName === "calculateMatrixAverage") {
+        const formatSpecifier = cFormatSpecifier[functionName];
+        const matrix = args[0].replace(/\[/g, "{").replace(/\]/g, "}");
+        sourceCodeLine = `${sourceCode}\nint main() {\nint matrix[3][3] = ${matrix};\n${printFunction}("${formatSpecifier}", ${functionName}(matrix, 3, 3));\nreturn 0;\n}`;
+      }
+
+    } else {
+      sourceCodeLine = `${sourceCode}\n${printFunction}(${functionName}(${args.join(
+        ", "
+      )}))`;
+    }
     sourceCodeArray.push(sourceCodeLine);
   }
   return sourceCodeArray;
 };
 
 export const camelToSnake = (camelCase) => {
-  let snakeCase = '';
+  let snakeCase = "";
   for (let i = 0; i < camelCase.length; i++) {
-      const char = camelCase[i];
-      if (char === char.toUpperCase()) {
-          snakeCase += '_' + char.toLowerCase();
-      } else {
-          snakeCase += char;
-      }
+    const char = camelCase[i];
+    if (char === char.toUpperCase()) {
+      snakeCase += "_" + char.toLowerCase();
+    } else {
+      snakeCase += char;
+    }
   }
   // If the string starts with an uppercase letter, lowercase the first letter in the snake_case string
-  if (snakeCase[0] === '_') {
-      snakeCase = snakeCase.substring(1);
+  if (snakeCase[0] === "_") {
+    snakeCase = snakeCase.substring(1);
   }
   return snakeCase;
-}
+};
