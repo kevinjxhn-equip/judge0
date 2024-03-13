@@ -69,7 +69,6 @@ const ProgrammingTestTemplate = () => {
                       label="Changes Code Editor to Light Mode"
                       hasArrow
                       aria-label="Light Mode"
-                      bg="gray.200"
                       placement="right"
                       closeOnClick={true}
                       openDelay={2000}
@@ -90,7 +89,6 @@ const ProgrammingTestTemplate = () => {
                       label="Changes Code Editor to Dark Mode"
                       hasArrow
                       aria-label="Dark Mode"
-                      bg="gray.200"
                       placement="right"
                       closeOnClick={true}
                       openDelay={2000}
