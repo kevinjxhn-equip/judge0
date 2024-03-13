@@ -59,7 +59,7 @@ async function initializeApp() {
     const data = {
       language_id: langId,
       source_code: sourceCodeArray[0],
-      callback_url: `https://bd0b-2401-4900-1f26-794b-6d46-8147-9464-5c37.ngrok-free.app/judge0_webhook_user_code_execution?userName=${userName}`,
+      callback_url: `https://8485-2401-4900-1f26-794b-6d46-8147-9464-5c37.ngrok-free.app/judge0_webhook_user_code_execution?userName=${userName}`,
       stdin,
     };
 
@@ -133,7 +133,7 @@ async function initializeApp() {
       source_code: sourceCode,
       expected_output: testCases.outputTestCases[index],
       stdin: testCases.inputTestCases[index],
-      callback_url: `https://bd0b-2401-4900-1f26-794b-6d46-8147-9464-5c37.ngrok-free.app/judge0_webhook_submit_user_code?userName=${userName}`,
+      callback_url: `https://8485-2401-4900-1f26-794b-6d46-8147-9464-5c37.ngrok-free.app/judge0_webhook_submit_user_code?userName=${userName}`,
     }));
 
     try {
