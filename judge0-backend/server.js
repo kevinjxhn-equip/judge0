@@ -1,15 +1,15 @@
-import express from "express";
-import dotenv from "dotenv";
-import cors from "cors";
-import axios from "axios";
-import bodyParser from "body-parser";
-import { TEST_CASES_STRING, TEST_CASES_MATRIX } from "./testcases.js";
-import {
+const express = require("express");
+const dotenv = require("dotenv");
+const cors = require("cors");
+const axios = require("axios");
+const bodyParser = require("body-parser");
+const { TEST_CASES_STRING, TEST_CASES_MATRIX } = require("./testcases.js");
+const {
   decodeBase64,
   sortByToken,
   appendSourceCodeBasedOnLanguageAndFunctionName,
   camelToSnake,
-} from "./helpers.js";
+} = require("./helpers.js");
 
 dotenv.config();
 

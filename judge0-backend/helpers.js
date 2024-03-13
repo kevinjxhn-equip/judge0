@@ -1,5 +1,5 @@
 // Function to decode base64 data from Judge0
-export const decodeBase64 = (data) => {
+const decodeBase64 = (data) => {
   const decodedData = {};
   for (const key in data) {
     if (key === "time" || key === "token") {
@@ -19,7 +19,7 @@ export const decodeBase64 = (data) => {
 };
 
 // Function to sort the data based on token
-export const sortByToken = (tokenData, dataToSort) => {
+const sortByToken = (tokenData, dataToSort) => {
   return dataToSort.sort((a, b) => {
     const tokenA = tokenData.findIndex(
       (tokenObj) => tokenObj.token === a.token
@@ -32,7 +32,7 @@ export const sortByToken = (tokenData, dataToSort) => {
 };
 
 // Function to append source code based on language and function name
-export const appendSourceCodeBasedOnLanguageAndFunctionName = (
+const appendSourceCodeBasedOnLanguageAndFunctionName = (
   langId,
   sourceCode,
   functionName,
@@ -82,7 +82,6 @@ export const appendSourceCodeBasedOnLanguageAndFunctionName = (
         const matrix = args[0].replace(/\[/g, "{").replace(/\]/g, "}");
         sourceCodeLine = `${sourceCode}\nint main() {\nint matrix[3][3] = ${matrix};\n${printFunction}("${formatSpecifier}", ${functionName}(matrix, 3, 3));\nreturn 0;\n}`;
       }
-
     } else {
       sourceCodeLine = `${sourceCode}\n${printFunction}(${functionName}(${args.join(
         ", "
@@ -93,7 +92,7 @@ export const appendSourceCodeBasedOnLanguageAndFunctionName = (
   return sourceCodeArray;
 };
 
-export const camelToSnake = (camelCase) => {
+const camelToSnake = (camelCase) => {
   let snakeCase = "";
   for (let i = 0; i < camelCase.length; i++) {
     const char = camelCase[i];
@@ -108,4 +107,11 @@ export const camelToSnake = (camelCase) => {
     snakeCase = snakeCase.substring(1);
   }
   return snakeCase;
+};
+
+module.exports = {
+  decodeBase64,
+  sortByToken,
+  appendSourceCodeBasedOnLanguageAndFunctionName,
+  camelToSnake,
 };

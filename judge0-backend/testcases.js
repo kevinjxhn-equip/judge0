@@ -1,9 +1,9 @@
-export const TEST_CASES_STRING = {
+module.exports.TEST_CASES_STRING = {
   inputTestCases: [['"aaa"'], ['"bc"']],
   outputTestCases: ["a", "b"],
 };
 
-export const TEST_CASES_MATRIX = {
+module.exports.TEST_CASES_MATRIX = {
   inputTestCases: [
     [
       [
