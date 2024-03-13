@@ -22,8 +22,16 @@ app.use(cors());
 app.use(bodyParser.json());
 
 // Judge0 API instance
+// const judge0Api = axios.create({
+//   baseURL: "http://127.0.0.1:2358",
+// });
+
 const judge0Api = axios.create({
-  baseURL: "http://127.0.0.1:2358",
+  baseURL: "https://judge0-ce.p.rapidapi.com",
+  headers: {
+    "X-RapidAPI-Key": process.env.RAPIDAPI_KEY,
+    "X-RapidAPI-Host": process.env.RAPIDAPI_HOST,
+  },
 });
 
 const userCustomSubmissionResultMap = new Map();
@@ -51,7 +59,7 @@ async function initializeApp() {
     const data = {
       language_id: langId,
       source_code: sourceCodeArray[0],
-      callback_url: `http://host.docker.internal:${port}/judge0_webhook_user_code_execution?userName=${userName}`,
+      callback_url: `https://bd0b-2401-4900-1f26-794b-6d46-8147-9464-5c37.ngrok-free.app/judge0_webhook_user_code_execution?userName=${userName}`,
       stdin,
     };
 
@@ -125,7 +133,7 @@ async function initializeApp() {
       source_code: sourceCode,
       expected_output: testCases.outputTestCases[index],
       stdin: testCases.inputTestCases[index],
-      callback_url: `http://host.docker.internal:${port}/judge0_webhook_submit_user_code?userName=${userName}`,
+      callback_url: `https://bd0b-2401-4900-1f26-794b-6d46-8147-9464-5c37.ngrok-free.app/judge0_webhook_submit_user_code?userName=${userName}`,
     }));
 
     try {
