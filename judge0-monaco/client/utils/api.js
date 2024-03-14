@@ -19,9 +19,6 @@ const pollForResult = (serverUrl, userName) => {
           resolve(response.data); // Resolve with submission result data
         } else if (response.status === 204) {
           retryCount++;
-          // console.log(
-          //   `Polling: Response status 204, retry attempt ${retryCount}`
-          // );
 
           if (retryCount >= maxRetries) {
             clearInterval(pollInterval); // Stop polling
@@ -36,7 +33,7 @@ const pollForResult = (serverUrl, userName) => {
   });
 };
 
-export const getResponseAfterSubmittingUserCode = async (
+export const getResponseAfterSubmittingUserCodeAgainstSampleTestCases = async (
   language,
   sourceCode,
   userName,
@@ -53,6 +50,31 @@ export const getResponseAfterSubmittingUserCode = async (
     });
 
     return await pollForResult("judge0_webhook_submit_user_code", userName);
+  } catch (error) {
+    throw new Error("Error while submitting user's code.");
+  }
+};
+
+export const getResponseAfterSubmittingUserCodeAgainstRealTestCases = async (
+  language,
+  sourceCode,
+  userName,
+  functionName
+) => {
+  const langId = JUDGE0_LANGS_ID[language];
+
+  try {
+    await axios.post(`${baseUrl}/submit_user_code_real_test_cases`, {
+      langId,
+      sourceCode,
+      userName,
+      functionName,
+    });
+
+    return await pollForResult(
+      "judge0_webhook_submit_user_code_real_test_cases",
+      userName
+    );
   } catch (error) {
     throw new Error("Error while submitting user's code.");
   }

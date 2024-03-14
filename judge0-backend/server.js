@@ -3,7 +3,7 @@ const dotenv = require("dotenv");
 const cors = require("cors");
 const axios = require("axios");
 const bodyParser = require("body-parser");
-const { TEST_CASES_STRING, TEST_CASES_MATRIX } = require("./testcases.js");
+const { TEST_CASES_STRING, TEST_CASES_MATRIX, REAL_TEST_CASES_STRING, REAL_TEST_CASES_MATRIX } = require("./testcases.js");
 const {
   decodeBase64,
   sortByToken,
@@ -170,6 +170,104 @@ async function initializeApp() {
 
   // Route to get the result of user code submission
   app.get("/judge0_webhook_submit_user_code", (req, res) => {
+    const { userName } = req.query;
+
+    try {
+      const batchSubmissionResultDataList =
+        batchSubmissionResultDataMap.get(userName);
+      const responseTokenData = userTokenDataMap.get(userName);
+
+      if (
+        batchSubmissionResultDataList &&
+        batchSubmissionResultDataList.length > 0 &&
+        responseTokenData
+      ) {
+        const sortedData = sortByToken(
+          responseTokenData,
+          batchSubmissionResultDataList
+        );
+        res.status(200).json(sortedData);
+
+        // Remove the token data associated with the user
+        userTokenDataMap.delete(userName);
+        batchSubmissionResultDataMap.delete(userName);
+      } else {
+        res.status(204).send("No submission result data available.");
+      }
+    } catch (error) {
+      res.status(500).send("An error occurred while processing the request.");
+      userTokenDataMap.delete(userName);
+      batchSubmissionResultDataMap.delete(userName);
+    }
+  });
+
+  // Route to submit user code against real test cases
+  app.post("/submit_user_code_real_test_cases", async (req, res) => {
+    const { langId, sourceCode, userName } = req.body;
+    let { functionName } = req.body;
+
+    if (langId === "71") {
+      functionName = camelToSnake(functionName);
+    }
+
+    let testCases = REAL_TEST_CASES_STRING;
+
+    if (
+      functionName === "calculateMatrixAverage" ||
+      functionName === "calculate_matrix_average"
+    ) {
+      testCases = REAL_TEST_CASES_MATRIX;
+    }
+
+    const sourceCodeArray = appendSourceCodeBasedOnLanguageAndFunctionName(
+      langId,
+      sourceCode,
+      functionName,
+      testCases.inputTestCases
+    );
+
+    const submissions = sourceCodeArray.map((sourceCode, index) => ({
+      language_id: langId,
+      source_code: sourceCode,
+      expected_output: testCases.outputTestCases[index],
+      stdin: testCases.inputTestCases[index],
+      callback_url: `https://judge0-backend.onrender.com/judge0_webhook_submit_user_code_real_test_cases?userName=${userName}`,
+    }));
+
+    try {
+      const response = await judge0Api.post("/submissions/batch", {
+        submissions,
+      });
+
+      const responseTokenData = response.data;
+      userTokenDataMap.set(userName, responseTokenData);
+
+      res
+        .status(200)
+        .json({ message: "User code execution started successfully." });
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  });
+
+  // Route to handle webhook from Judge0 after submitting user code against real test cases
+  app.put("/judge0_webhook_submit_user_code_real_test_cases", (req, res) => {
+    const { userName } = req.query;
+    const decodedSubmissionResultData = decodeBase64(req.body);
+
+    if (!batchSubmissionResultDataMap.has(userName)) {
+      batchSubmissionResultDataMap.set(userName, []);
+    }
+
+    batchSubmissionResultDataMap
+      .get(userName)
+      .push(decodedSubmissionResultData);
+
+    res.status(200).json({ message: "Webhook recieved successfully." });
+  });
+
+  // Route to get the result of user code submission 
+  app.get("/judge0_webhook_submit_user_code_real_test_cases", (req, res) => {
     const { userName } = req.query;
 
     try {

@@ -1,6 +1,16 @@
-import { Box, Button, ButtonGroup, Flex, Text } from "@chakra-ui/react";
+import {
+  Box,
+  Button,
+  ButtonGroup,
+  Flex,
+  Text,
+  useToast,
+} from "@chakra-ui/react";
 import React, { useState, useEffect, useContext } from "react";
-import { getResponseAfterSubmittingUserCode } from "../utils/api";
+import {
+  getResponseAfterSubmittingUserCodeAgainstRealTestCases,
+  getResponseAfterSubmittingUserCodeAgainstSampleTestCases,
+} from "../utils/api";
 import CustomTestCaseSection from "./CustomTestCaseSection";
 import {
   editorRefProvider,
@@ -18,6 +28,7 @@ const Output = () => {
   const [batchOutput, setBatchOutput] = useState(null);
 
   const [userName, setUserName] = useState("");
+  const toast = useToast();
 
   const questionType = useContext(questionTypeProvider);
   const editorRef = useContext(editorRefProvider);
@@ -43,6 +54,7 @@ const Output = () => {
   const [loadingState, setLoadingState] = useState({
     isSubmitLoading: false,
     isCustomTestLoading: false,
+    isRunTestLoading: false,
   });
 
   // function to run custom test case
@@ -50,23 +62,6 @@ const Output = () => {
     const sourceCode = editorRef.current.getValue();
 
     if (!sourceCode) return;
-
-    if (questionType === "matrix") {
-      let sanitisedInput;
-      try {
-        sanitisedInput = JSON.parse(customInput);
-      } catch (error) {
-        setIsCustomError(true);
-        setCustomTestCaseOutput(["Input is not in array format"]);
-      }
-
-      // Input is not an array
-      if (!Array.isArray(sanitisedInput)) {
-        setIsCustomError(true);
-        setCustomTestCaseOutput(["Input is not an array"]);
-        return;
-      }
-    }
 
     try {
       setLoadingState((prevState) => ({
@@ -133,7 +128,6 @@ const Output = () => {
     }
   };
 
-  // function to submit code against sample test cases
   const submitCode = async () => {
     const sourceCode = editorRef.current.getValue();
 
@@ -141,12 +135,56 @@ const Output = () => {
 
     try {
       setLoadingState((prevState) => ({ ...prevState, isSubmitLoading: true }));
-      const result = await getResponseAfterSubmittingUserCode(
-        activeLanguage,
-        sourceCode,
-        userName,
-        functionName
-      );
+      const results =
+        await getResponseAfterSubmittingUserCodeAgainstRealTestCases(
+          activeLanguage,
+          sourceCode,
+          userName,
+          functionName
+        );
+
+      const passedCount = results.filter(
+        (result) => result.status.id === 3
+      ).length;
+      const totalCount = results.length;
+
+      const message = `You passed ${passedCount} out of ${totalCount} test cases.`;
+
+      toast({
+        title: "Submission Status",
+        description: `${message}`,
+        status: passedCount === totalCount ? "success" : "error",
+        duration: 5000,
+        isClosable: true,
+      });
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoadingState((prevState) => ({
+        ...prevState,
+        isSubmitLoading: false,
+      }));
+    }
+  };
+
+  // function to submit code against sample test cases
+  const runTests = async () => {
+    const sourceCode = editorRef.current.getValue();
+
+    if (!sourceCode) return;
+
+    try {
+      setLoadingState((prevState) => ({
+        ...prevState,
+        isRunTestLoading: true,
+      }));
+      const result =
+        await getResponseAfterSubmittingUserCodeAgainstSampleTestCases(
+          activeLanguage,
+          sourceCode,
+          userName,
+          functionName
+        );
 
       const updatedBatchOutput = result.map((item) => {
         const statusId = item.status.id;
@@ -206,7 +244,7 @@ const Output = () => {
     } finally {
       setLoadingState((prevState) => ({
         ...prevState,
-        isSubmitLoading: false,
+        isRunTestLoading: false,
       }));
     }
   };
@@ -256,7 +294,7 @@ const Output = () => {
             </Text>
           ) : (
             <Text fontWeight={600}>
-              {loadingState.isSubmitLoading
+              {loadingState.isRunTestLoading
                 ? "Running..."
                 : batchOutput
                 ? batchOutput.some(
@@ -285,12 +323,20 @@ const Output = () => {
             <Button
               variant={"solid"}
               colorScheme="purple"
-              onClick={submitCode}
-              isLoading={loadingState.isSubmitLoading}
+              onClick={runTests}
+              isLoading={loadingState.isRunTestLoading}
             >
               Run Tests
             </Button>
           )}
+          <Button
+            variant={"solid"}
+            colorScheme="green"
+            onClick={submitCode}
+            isLoading={loadingState.isSubmitLoading}
+          >
+            Submit
+          </Button>
         </ButtonGroup>
       </Flex>
 
