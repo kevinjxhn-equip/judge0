@@ -25,16 +25,11 @@ export function appendBoilerPlateToSourceCode(
   functionName,
   langId
 ) {
-  let appendedSourceCode;
   const boilerPlate =
     questions[functionName === "firstCharacter" ? 0 : 1].boilerPlate[langId];
-  if (boilerPlate.includes("\n")) {
-    appendedSourceCode = sourceCode + "\n" + boilerPlate;
-  } else {
-    appendedSourceCode = sourceCode + " " + boilerPlate;
-  }
+  const appendedSourceCode = sourceCode + "\n" + boilerPlate;
 
-  console.log(appendedSourceCode)
+  console.log(appendedSourceCode);
   return appendedSourceCode;
 }
 
