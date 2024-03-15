@@ -382,18 +382,18 @@ const Output = () => {
                     bg={"#f3f4f6"}
                   >
                     <Box flex={1} textAlign="center" p={2}>
-                      <Text fontWeight={700}>aaa</Text>
+                      <Text fontWeight={700}>"aaa"</Text>
                     </Box>
                     <Box flex={1} textAlign="center" p={2}>
-                      <Text fontWeight={700}>a</Text>
+                      <Text fontWeight={700}>"a"</Text>
                     </Box>
                   </Flex>
                   <Flex justify="space-between" align="center" flex={1}>
                     <Box flex={1} textAlign="center" p={2}>
-                      <Text fontWeight={700}>bc</Text>
+                      <Text fontWeight={700}>"bc"</Text>
                     </Box>
                     <Box flex={1} textAlign="center" p={2}>
-                      <Text fontWeight={700}>b</Text>
+                      <Text fontWeight={700}>"b"</Text>
                     </Box>
                   </Flex>
                 </>

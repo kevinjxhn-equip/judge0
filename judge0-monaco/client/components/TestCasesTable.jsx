@@ -26,12 +26,12 @@ const TestCasesTable = () => {
           {questionType === "string" ? (
             <>
               <Tr>
-                <Td>aaa</Td>
-                <Td>a</Td>
+                <Td>"aaa"</Td>
+                <Td>"a"</Td>
               </Tr>
               <Tr>
-                <Td>bc</Td>
-                <Td>b</Td>
+                <Td>"bc"</Td>
+                <Td>"b"</Td>
               </Tr>
             </>
           ) : (
