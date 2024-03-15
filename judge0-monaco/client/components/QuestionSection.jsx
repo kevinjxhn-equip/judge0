@@ -1,8 +1,8 @@
 import React from "react";
 import { Box, Flex, ListItem, Text, UnorderedList } from "@chakra-ui/react";
 import TestCasesTable from "./TestCasesTable";
-import { Kbd } from "@chakra-ui/react";
 import { questionTypeProvider } from "./ProgrammingTestTemplate";
+import { questions } from "../utils/questions";
 
 const QuestionSection = () => {
   const questionType = React.useContext(questionTypeProvider);
@@ -56,28 +56,9 @@ const QuestionSection = () => {
         </Box>
 
         {questionType === "string" ? (
-          <Text mt={3}>
-            Given a string <Kbd bg={"gray.100"}>s</Kbd> , you must return the
-            first character of the string.
-            <br />
-            <br />
-            You are guaranteed that the string has at least one character. Don't
-            change the name of the <Kbd bg={"gray.100"}>main</Kbd> function on
-            the right. You may write other code inside and outside the function.
-          </Text>
+          <Text mt={3}>{questions[0].questionText}</Text>
         ) : (
-          <Text mt={3}>
-            Given a matrix <Kbd bg={"gray.100"}>mat</Kbd> , you must return the
-            average of the matrix.
-            <br />
-            <br />
-            You are guaranteed that the matrix <Kbd bg={"gray.100"}>
-              mat
-            </Kbd>{" "}
-            has at least one element. Don't change the name of the{" "}
-            <Kbd bg={"gray.100"}>main</Kbd> function on the right. You may write
-            other code inside and outside the function.
-          </Text>
+          <Text mt={3}>{questions[1].questionText}</Text>
         )}
       </Box>
 

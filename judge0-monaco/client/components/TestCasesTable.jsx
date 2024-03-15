@@ -9,6 +9,7 @@ import {
 } from "@chakra-ui/react";
 import React from "react";
 import { questionTypeProvider } from "./ProgrammingTestTemplate";
+import { questions } from "../utils/questions";
 
 const TestCasesTable = () => {
   const questionType = React.useContext(questionTypeProvider);
@@ -26,23 +27,23 @@ const TestCasesTable = () => {
           {questionType === "string" ? (
             <>
               <Tr>
-                <Td>"aaa"</Td>
-                <Td>"a"</Td>
+                <Td>{questions[0].testcaseText1.input}</Td>
+                <Td>{questions[0].testcaseText1.output}</Td>
               </Tr>
               <Tr>
-                <Td>"bc"</Td>
-                <Td>"b"</Td>
+                <Td>{questions[0].testcaseText2.input}</Td>
+                <Td>{questions[0].testcaseText2.output}</Td>
               </Tr>
             </>
           ) : (
             <>
-              <Tr>
-                <Td>[[1, 2, 3], [3, 4, 5], [7, 7, 7]]</Td>
-                <Td>4.3</Td>
+               <Tr>
+                <Td>{questions[1].testcaseText1.input}</Td>
+                <Td>{questions[1].testcaseText1.output}</Td>
               </Tr>
               <Tr>
-                <Td>[[1, 2, 3], [1, 2, 3], [1, 2, 3]]</Td>
-                <Td>2.0</Td>
+                <Td>{questions[1].testcaseText2.input}</Td>
+                <Td>{questions[1].testcaseText2.output}</Td>
               </Tr>
             </>
           )}

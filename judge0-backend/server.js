@@ -1,15 +1,14 @@
-const express = require("express");
-const dotenv = require("dotenv");
-const cors = require("cors");
-const axios = require("axios");
-const bodyParser = require("body-parser");
-const { TEST_CASES_STRING, TEST_CASES_MATRIX, REAL_TEST_CASES_STRING, REAL_TEST_CASES_MATRIX } = require("./testcases.js");
-const {
+import express from "express";
+import dotenv from "dotenv";
+import cors from "cors";
+import axios from "axios";
+import bodyParser from "body-parser";
+import {
   decodeBase64,
   sortByToken,
-  appendSourceCodeBasedOnLanguageAndFunctionName,
-  camelToSnake,
-} = require("./helpers.js");
+  appendBoilerPlateToSourceCode,
+} from "./helpers.js";
+import { questions } from "../judge0-monaco/client/utils/questions.js";
 
 dotenv.config();
 
@@ -22,6 +21,7 @@ app.use(cors());
 app.use(bodyParser.json());
 
 // Judge0 API instance
+
 // const judge0Api = axios.create({
 //   baseURL: "http://127.0.0.1:2358",
 // });
@@ -45,21 +45,19 @@ async function initializeApp() {
     const { langId, sourceCode, stdin, userName } = req.body;
     let { functionName } = req.body;
 
-    if (langId === "71") {
-      functionName = camelToSnake(functionName);
-    }
-
-    const sourceCodeArray = appendSourceCodeBasedOnLanguageAndFunctionName(
-      langId,
+    const appendedSourceCode = appendBoilerPlateToSourceCode(
       sourceCode,
       functionName,
-      stdin
+      langId
     );
+
+    console.log(appendedSourceCode);
 
     const data = {
       language_id: langId,
-      source_code: sourceCodeArray[0],
+      source_code: appendedSourceCode,
       callback_url: `https://judge0-backend.onrender.com/judge0_webhook_user_code_execution?userName=${userName}`,
+      // callback_url: `http://host.docker.internal:${port}/judge0_webhook_user_code_execution/?userName=${userName}`,
       stdin,
     };
 
@@ -108,33 +106,29 @@ async function initializeApp() {
     const { langId, sourceCode, userName } = req.body;
     let { functionName } = req.body;
 
-    if (langId === "71") {
-      functionName = camelToSnake(functionName);
-    }
-
-    let testCases = TEST_CASES_STRING;
-
-    if (
-      functionName === "calculateMatrixAverage" ||
-      functionName === "calculate_matrix_average"
-    ) {
-      testCases = TEST_CASES_MATRIX;
-    }
-
-    const sourceCodeArray = appendSourceCodeBasedOnLanguageAndFunctionName(
-      langId,
+    const appendedSourceCode = appendBoilerPlateToSourceCode(
       sourceCode,
       functionName,
-      testCases.inputTestCases
+      langId
     );
 
-    const submissions = sourceCodeArray.map((sourceCode, index) => ({
-      language_id: langId,
-      source_code: sourceCode,
-      expected_output: testCases.outputTestCases[index],
-      stdin: testCases.inputTestCases[index],
-      callback_url: `https://judge0-backend.onrender.com/judge0_webhook_submit_user_code?userName=${userName}`,
-    }));
+    let question;
+    if (functionName === "firstCharacter") {
+      question = questions[0];
+    } else if (functionName === "calculateMatrixAverage") {
+      question = questions[1];
+    }
+
+    const submissions = question.sampleTestcases.inputTestCases.map(
+      (input, index) => ({
+        language_id: langId,
+        source_code: appendedSourceCode,
+        expected_output: question.sampleTestcases.outputTestCases[index],
+        stdin: input,
+        callback_url: `https://judge0-backend.onrender.com/judge0_webhook_submit_user_code/?userName=${userName}`,
+        // callback_url: `http://host.docker.internal:${port}/judge0_webhook_submit_user_code/?userName=${userName}`,
+      })
+    );
 
     try {
       const response = await judge0Api.post("/submissions/batch", {
@@ -206,33 +200,29 @@ async function initializeApp() {
     const { langId, sourceCode, userName } = req.body;
     let { functionName } = req.body;
 
-    if (langId === "71") {
-      functionName = camelToSnake(functionName);
-    }
-
-    let testCases = REAL_TEST_CASES_STRING;
-
-    if (
-      functionName === "calculateMatrixAverage" ||
-      functionName === "calculate_matrix_average"
-    ) {
-      testCases = REAL_TEST_CASES_MATRIX;
-    }
-
-    const sourceCodeArray = appendSourceCodeBasedOnLanguageAndFunctionName(
-      langId,
+    const appendedSourceCode = appendBoilerPlateToSourceCode(
       sourceCode,
       functionName,
-      testCases.inputTestCases
+      langId
     );
 
-    const submissions = sourceCodeArray.map((sourceCode, index) => ({
-      language_id: langId,
-      source_code: sourceCode,
-      expected_output: testCases.outputTestCases[index],
-      stdin: testCases.inputTestCases[index],
-      callback_url: `https://judge0-backend.onrender.com/judge0_webhook_submit_user_code_real_test_cases?userName=${userName}`,
-    }));
+    let question;
+    if (functionName === "firstCharacter") {
+      question = questions[0];
+    } else if (functionName === "calculateMatrixAverage") {
+      question = questions[1];
+    }
+
+    const submissions = question.realTestCases.inputTestCases.map(
+      (input, index) => ({
+        language_id: langId,
+        source_code: appendedSourceCode,
+        expected_output: question.realTestCases.outputTestCases[index],
+        stdin: input,
+        callback_url: `https://judge0-backend.onrender.com/judge0_webhook_submit_user_code_real_test_cases?userName=${userName}`,
+        // callback_url: `http://host.docker.internal:${port}/judge0_webhook_submit_user_code_real_test_cases?userName=${userName}`,
+      })
+    );
 
     try {
       const response = await judge0Api.post("/submissions/batch", {
@@ -266,7 +256,7 @@ async function initializeApp() {
     res.status(200).json({ message: "Webhook recieved successfully." });
   });
 
-  // Route to get the result of user code submission 
+  // Route to get the result of user code submission
   app.get("/judge0_webhook_submit_user_code_real_test_cases", (req, res) => {
     const { userName } = req.query;
 

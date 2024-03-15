@@ -1,4 +1,4 @@
-import React, { useState, useRef, createContext } from "react";
+import React, { useState, useRef, createContext, useEffect } from "react";
 import { Editor } from "@monaco-editor/react";
 import {
   Box,
@@ -23,8 +23,17 @@ const ProgrammingTestTemplate = () => {
   const [value, setValue] = useState("");
   const [activeLanguage, setActiveLanguage] = useState("javascript");
   const [isEditorDark, setIsEditorDark] = useState(true);
+  const [editorValue, setEditorValue] = useState();
 
   const editorRef = useRef(null);
+
+  useEffect(() => {
+    if (questionType === "string") {
+      setEditorValue(CODE_SNIPPETS_STRING);
+    } else {
+      setEditorValue(CODE_SNIPPETS_MATRIX);
+    }
+  }, []);
 
   let questionType;
   if (useLocation().pathname === "/") {
@@ -36,6 +45,11 @@ const ProgrammingTestTemplate = () => {
   const onMount = (editor) => {
     editorRef.current = editor;
     editor.focus();
+  };
+
+  const onChange = (newValue) => {
+    editorValue[activeLanguage] = newValue;
+    setValue(newValue);
   };
 
   const onSelect = (activeLanguage) => {
@@ -123,7 +137,7 @@ const ProgrammingTestTemplate = () => {
                       : CODE_SNIPPETS_MATRIX[activeLanguage]
                   }
                   value={value}
-                  onChange={(newValue) => setValue(newValue)}
+                  onChange={onChange}
                   onMount={onMount}
                 />
               </Box>
