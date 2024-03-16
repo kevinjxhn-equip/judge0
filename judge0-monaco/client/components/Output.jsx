@@ -117,7 +117,7 @@ const Output = () => {
         // Memory Limit Exceeded
       } else if (statusId === 11) {
         setIsCustomError(true);
-        setCustomTestCaseOutput(["Memory Limit Exceeded"]);
+        setCustomTestCaseOutput(["File too large. Memory Limit Exceeded"]);
 
         // Runtime Error and Internal Error
       } else {
