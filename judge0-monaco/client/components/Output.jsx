@@ -329,6 +329,10 @@ const Output = () => {
               isDisabled={
                 loadingState.isRunTestLoading || loadingState.isSubmitLoading
               }
+              _disabled={{
+                opacity: loadingState.isCustomTestLoading ? "1" : "0.5",
+                cursor: "not-allowed",
+              }}
             >
               <Flex align={"center"} gap={2}>
                 Run Custom Tests
@@ -343,6 +347,10 @@ const Output = () => {
               isDisabled={
                 loadingState.isCustomTestLoading || loadingState.isSubmitLoading
               }
+              _disabled={{
+                opacity: loadingState.isRunTestLoading ? "1" : "0.5",
+                cursor: "not-allowed",
+              }}
             >
               Run Tests
             </Button>
@@ -355,6 +363,10 @@ const Output = () => {
             isDisabled={
               loadingState.isCustomTestLoading || loadingState.isRunTestLoading
             }
+            _disabled={{
+              opacity: loadingState.isSubmitLoading ? "1" : "0.5",
+              cursor: "not-allowed",
+            }}
           >
             Submit
           </Button>
