@@ -114,6 +114,11 @@ const Output = () => {
         setIsCustomError(true);
         setCustomTestCaseOutput(["Time Limit Exceeded"]);
 
+        // Memory Limit Exceeded
+      } else if (statusId === 11) {
+        setIsCustomError(true);
+        setCustomTestCaseOutput(["Memory Limit Exceeded"]);
+
         // Runtime Error and Internal Error
       } else {
         setIsCustomError(true);
@@ -224,6 +229,12 @@ const Output = () => {
               color = "red.500";
               break;
 
+            // Memory Limit Exceeded
+            case 11:
+              errorMessage = ["Memory Limit Exceeded"];
+              color = "red.500";
+              break;
+
             // Runtime Error and Internal Error
             default:
               errorMessage = item.stderr.split("\n");
@@ -315,6 +326,9 @@ const Output = () => {
               colorScheme="purple"
               onClick={runCustomTestCase}
               isLoading={loadingState.isCustomTestLoading}
+              isDisabled={
+                loadingState.isRunTestLoading || loadingState.isSubmitLoading
+              }
             >
               <Flex align={"center"} gap={2}>
                 Run Custom Tests
@@ -326,6 +340,9 @@ const Output = () => {
               colorScheme="purple"
               onClick={runTests}
               isLoading={loadingState.isRunTestLoading}
+              isDisabled={
+                loadingState.isCustomTestLoading || loadingState.isSubmitLoading
+              }
             >
               Run Tests
             </Button>
@@ -335,6 +352,9 @@ const Output = () => {
             colorScheme="green"
             onClick={submitCode}
             isLoading={loadingState.isSubmitLoading}
+            isDisabled={
+              loadingState.isCustomTestLoading || loadingState.isRunTestLoading
+            }
           >
             Submit
           </Button>

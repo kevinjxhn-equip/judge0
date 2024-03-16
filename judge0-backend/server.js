@@ -2,7 +2,6 @@ import express from "express";
 import dotenv from "dotenv";
 import cors from "cors";
 import axios from "axios";
-import bodyParser from "body-parser";
 import {
   decodeBase64,
   sortByToken,
@@ -16,12 +15,10 @@ const app = express();
 const port = process.env.SERVER_PORT || 3000;
 
 // Middlewares
-app.use(express.json());
+app.use(express.json({ limit: "30mb" }));
 app.use(cors());
-app.use(bodyParser.json());
 
 // Judge0 API instance
-
 // const judge0Api = axios.create({
 //   baseURL: "http://127.0.0.1:2358",
 // });
@@ -50,8 +47,6 @@ async function initializeApp() {
       functionName,
       langId
     );
-
-    console.log(appendedSourceCode);
 
     const data = {
       language_id: langId,

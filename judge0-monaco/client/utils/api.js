@@ -7,7 +7,7 @@ const baseUrl = "https://judge0-backend.onrender.com";
 const pollForResult = (serverUrl, userName) => {
   return new Promise((resolve, reject) => {
     let retryCount = 0;
-    const maxRetries = 3;
+    const maxRetries = 5;
 
     const pollInterval = setInterval(async () => {
       try {
