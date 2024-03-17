@@ -8,6 +8,7 @@ import {
   appendBoilerPlateToSourceCode,
 } from "./helpers.js";
 import { questions } from "../judge0-monaco/client/utils/questions.js";
+import bodyParser from "body-parser";
 
 dotenv.config();
 
@@ -15,8 +16,8 @@ const app = express();
 const port = process.env.SERVER_PORT || 3000;
 
 // Middlewares
-app.use(express.json({ limit: "30mb" }));
 app.use(cors());
+app.use(bodyParser.json({ limit: "30mb" }));
 
 // Judge0 API instance
 // const judge0Api = axios.create({
